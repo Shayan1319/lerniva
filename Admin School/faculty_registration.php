@@ -103,6 +103,7 @@ if (!isset($_SESSION['admin_id'])) {
                 processData: false,
                 success: function(response) {
                     alert(response); // now response is just plain text
+                    $('#facultyForm')[0].reset();
                 },
                 error: function(xhr) {
                     alert('Error occurred: ' + xhr.responseText);
