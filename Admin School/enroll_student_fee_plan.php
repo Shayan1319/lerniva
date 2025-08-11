@@ -46,7 +46,7 @@ if (!isset($_SESSION['admin_id'])) {
                     <?php
       $fee_types = $conn->query("SELECT id, fee_name FROM fee_types WHERE school_id = $school_id AND status = 'active'");
       while ($row = $fee_types->fetch_assoc()) {
-          echo '<option value="'.$row['fee_name'].'">'.htmlspecialchars($row['fee_name']).'</option>';
+          echo '<option value="'.$row['id'].'">'.htmlspecialchars($row['fee_name']).'</option>';
       }
       ?>
                 </select>
