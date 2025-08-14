@@ -1,14 +1,20 @@
 <?php
-require_once '../sass/db_config.php'; // your DB connection file
+require_once '../sass/db_config.php'; // Your DB connection
 header('Content-Type: application/json');
 
-// Helper function
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 function clean_input($data) {
     return htmlspecialchars(strip_tags(trim($data)));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $required = ['school_name', 'school_type', 'registration_number', 'affiliation_board', 'school_email', 'school_phone', 'country', 'state', 'city', 'address', 'admin_contact_person', 'admin_email', 'admin_phone', 'password'];
+    $required = [
+        'school_name', 'school_type', 'registration_number', 'affiliation_board',
+        'school_email', 'school_phone', 'country', 'state', 'city', 'address',
+        'admin_contact_person', 'admin_email', 'admin_phone', 'password'
+    ];
 
     foreach ($required as $field) {
         if (empty($_POST[$field])) {
@@ -17,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Sanitize
+    // Sanitize inputs
     $school_name = clean_input($_POST['school_name']);
     $school_type = clean_input($_POST['school_type']);
     $registration_number = clean_input($_POST['registration_number']);
@@ -34,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $admin_phone = clean_input($_POST['admin_phone']);
     $password = password_hash(clean_input($_POST['password']), PASSWORD_DEFAULT);
 
-    // Check for duplicates
+    // Check duplicates
     $check = $conn->prepare("SELECT id FROM schools WHERE admin_email = ? OR school_email = ? OR registration_number = ?");
     $check->bind_param("sss", $admin_email, $school_email, $registration_number);
     $check->execute();
@@ -47,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Upload logo
     $logo_name = '';
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = __DIR__ . '../uploads/logos/';
+        $target_dir = __DIR__ . '/../uploads/logos/';
         if (!file_exists($target_dir)) {
             mkdir($target_dir, 0777, true);
         }
@@ -56,13 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         move_uploaded_file($_FILES['logo']['tmp_name'], $target_dir . $logo_name);
     }
 
-    // Insert
-    $stmt = $conn->prepare("INSERT INTO schools (school_name, school_type, registration_number, affiliation_board, school_email, school_phone, school_website, country, state, city, address, logo, admin_contact_person, admin_email, admin_phone, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    // Insert school
+    $stmt = $conn->prepare("INSERT INTO schools 
+        (school_name, school_type, registration_number, affiliation_board, school_email, school_phone, school_website, country, state, city, address, logo, admin_contact_person, admin_email, admin_phone, password) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssssssssssssss", $school_name, $school_type, $registration_number, $affiliation_board, $school_email, $school_phone, $school_website, $country, $state, $city, $address, $logo_name, $admin_contact_person, $admin_email, $admin_phone, $password);
 
     if ($stmt->execute()) {
         echo json_encode(['type' => 'success', 'message' => 'School registered successfully!']);
     } else {
-        echo json_encode(['type' => 'danger', 'message' => 'Failed to register school.']);
+        echo json_encode(['type' => 'danger', 'message' => 'Failed to register school: ' . $stmt->error]);
     }
 }
