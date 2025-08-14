@@ -192,6 +192,7 @@ $stmt->close();
                                 <li><a class="nav-link" href="chat.php">Chat</a></li>
                                 <li><a class="nav-link" href="calendar.php">Calendar</a></li>
                                 <li><a class="nav-link" href="apply_leave.php"> Apply for leave</a></li>
+                                <li><a class="nav-link" href="meeting_request_form.php"> Apply for Meeting</a></li>
                             </ul>
                         </li>
                         <li class="dropdown">
