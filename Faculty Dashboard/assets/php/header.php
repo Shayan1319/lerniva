@@ -194,20 +194,20 @@ $stmt->close();
                                 <li><a class="nav-link" href="apply_leave.php"> Apply for leave</a></li>
                             </ul>
                         </li>
-                        <!-- <li class="dropdown">
-                            <a href="#" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="mail"></i><span>Email</span></a>
-                            <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="email-inbox.php">Inbox</a></li>
-                                <li><a class="nav-link" href="email-compose.php">Compose</a></li>
-                                <li><a class="nav-link" href="email-read.php">read</a></li>
-                            </ul>
-                        </li> -->
                         <li class="dropdown">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="clipboard"></i><span>Test / Assignment</span></a>
+                            <ul class="dropdown-menu">
+                                <li><a class="nav-link" href="assignment-test.php">Add</a></li>
+                                <li><a class="nav-link" href="assigment-result.php">Submit Result</a></li>
+                                <li><a class="nav-link" href="show-result.php">Results</a></li>
+                            </ul>
+                        </li>
+                        <!-- <li class="dropdown">
                             <a href="assignment-test.php" class="nav-link">
                                 <i data-feather="clipboard"></i><span>Test / Assignment</span>
                             </a>
-                        </li>
+                        </li> -->
                         <li class="dropdown">
                             <a href="Dairy.php" class="nav-link">
                                 <i data-feather="book"></i><span>Dairy</span>

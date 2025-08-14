@@ -8,7 +8,6 @@
 }
 </style>
 
-<!-- Main Content -->
 <div class="main-content">
     <section class="section">
         <div class="section-header">
@@ -26,6 +25,20 @@
                         <option value="">Select</option>
                         <option value="Test">Test</option>
                         <option value="Assignment">Assignment</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Class</label>
+                    <select name="class_id" id="classSelect" class="form-control" required>
+                        <option value="">Select Class</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Subject</label>
+                    <select name="subject_id" id="subjectSelect" class="form-control" required>
+                        <option value="">Select Subject</option>
                     </select>
                 </div>
 
@@ -77,18 +90,42 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function() {
-    loadTasks();
 
-    // Submit form (insert/update)
+    var teacherId = $("input[name=teacher_id]").val();
+
+    // Load classes for teacher
+    function loadClasses() {
+        $.post("ajax/teacher_classes.php", {
+            teacher_id: teacherId
+        }, function(data) {
+            $("#classSelect").html('<option value="">Select Class</option>' + data);
+        });
+    }
+
+    loadClasses();
+
+    // When class changes, load subjects
+    $("#classSelect").change(function() {
+        var classId = $(this).val();
+        if (classId) {
+            $.post("ajax/get_class_subjects.php", {
+                teacher_id: teacherId,
+                class_id: classId
+            }, function(data) {
+                $("#subjectSelect").html('<option value="">Select Subject</option>' + data);
+            });
+        } else {
+            $("#subjectSelect").html('<option value="">Select Subject</option>');
+        }
+    });
+
+    // Submit Test/Assignment form
     $("#testAssignmentForm").on("submit", function(e) {
         e.preventDefault();
-
         var formData = new FormData(this);
         var updateId = $("button[type=submit]").data("update-id");
         formData.append("action", updateId ? "update" : "insert");
-        if (updateId) {
-            formData.append("id", updateId);
-        }
+        if (updateId) formData.append("id", updateId);
 
         $.ajax({
             url: "ajax/test_assignment_crud.php",
@@ -98,6 +135,7 @@ $(document).ready(function() {
             contentType: false,
             success: function(data) {
                 $("#result").html(data);
+
                 $("#testAssignmentForm")[0].reset();
                 $("button[type=submit]").text("Save").removeData("update-id");
                 loadTasks();
@@ -105,7 +143,7 @@ $(document).ready(function() {
         });
     });
 
-    // Load all
+    // Load all tasks
     function loadTasks() {
         $.post("ajax/test_assignment_crud.php", {
             action: "getAll"
@@ -114,8 +152,10 @@ $(document).ready(function() {
         });
     }
 
-    // Edit
-    $(document).on("click", ".editTask", function() {
+    loadTasks();
+
+    // Edit Task
+    $(document).on("click", ".editAssignment", function() {
         var id = $(this).data("id");
         $.post("ajax/test_assignment_crud.php", {
             id: id,
@@ -123,6 +163,10 @@ $(document).ready(function() {
         }, function(data) {
             var t = JSON.parse(data);
             $("select[name=type]").val(t.type);
+            $("select[name=class_id]").val(t.class_meta_id).change();
+            setTimeout(function() {
+                $("select[name=subject_id]").val(t.subject);
+            }, 300);
             $("input[name=title]").val(t.title);
             $("textarea[name=description]").val(t.description);
             $("input[name=due_date]").val(t.due_date);
@@ -132,10 +176,10 @@ $(document).ready(function() {
         });
     });
 
-    // Delete
+    // Delete Task
     $(document).on("click", ".deleteTask", function() {
         var id = $(this).data("id");
-        if (confirm("Are you sure you want to delete this?")) {
+        if (confirm("Are you sure to delete?")) {
             $.post("ajax/test_assignment_crud.php", {
                 id: id,
                 action: "delete"
@@ -145,6 +189,7 @@ $(document).ready(function() {
             });
         }
     });
+
 });
 </script>
 
