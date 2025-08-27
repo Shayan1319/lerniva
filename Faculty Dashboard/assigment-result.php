@@ -1,11 +1,11 @@
-<style>
-#apps {
-    padding-left: 20px;
-    position: relative;
-    color: #6777ef;
-    background-color: #f0f3ff;
-}
-</style>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let el = document.getElementById("test");
+    if (el) {
+        el.classList.add("active");
+    }
+});
+</script>
 
 <?php require_once 'assets/php/header.php'; ?>
 
@@ -86,7 +86,7 @@ $(document).ready(function() {
         } else {
             $('#studentsTable tbody').html(
                 '<tr><td colspan="12" class="text-center">Select Test/Assignment to load students</td></tr>'
-                );
+            );
         }
     });
 

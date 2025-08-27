@@ -1,10 +1,4 @@
 "use strict";
-window.onerror = function (message, source, lineno, colno, error) {
-  alert(
-    `JS Error:\nMessage: ${message}\nSource: ${source}\nLine: ${lineno}\nColumn: ${colno}\nError object: ${error}`
-  );
-  return false; // Let the error propagate as well (optional)
-};
 
 $(window).on("load", function () {
   $(".loader").fadeOut("slow");
@@ -637,6 +631,7 @@ $(function () {
   //   bodytag.addClass("theme-" + $(this).attr("title"));
   // });
   $(".choose-theme li").on("click", function () {
+    alert("click");
     var selectedTheme = $(this).attr("title"); // get selected theme from title attribute
 
     // Update UI: remove previous active and add to clicked
@@ -664,6 +659,7 @@ $(function () {
       dataType: "json",
       success: function (response) {
         if (response.status === "success") {
+          alert("uplodaet");
           load_setting();
         } else {
           alert("Error updating theme: " + response.message);
@@ -688,7 +684,7 @@ $(function () {
       },
       success: function (response) {
         if (response.status === "success") {
-          alert("Sidebar color updated successfully!");
+          load_setting();
         } else {
           alert("Error: " + response.message);
         }
@@ -702,7 +698,6 @@ $(function () {
   // dark light layout button setting
   $(".layout-color input:radio").change(function () {
     var layout = $(this).val();
-
     $.ajax({
       url: "ajax/update_user_settings.php", // your PHP update script
       method: "POST",
@@ -747,22 +742,14 @@ $(function () {
         $(".choose-theme li").removeClass("active");
         $(".choose-theme li[title='" + theme + "']").addClass("active");
         if (layout == 1) {
-          $("body").removeClass();
+          $("body").removeClass("dark dark-sidebar");
           $("body").addClass("light");
           $("body").addClass("light-sidebar");
-          $("body").addClass("theme-white");
-
-          $(".choose-theme li").removeClass("active");
-          $(".choose-theme li[title|='white']").addClass("active");
           $(".selectgroup-input-radio[value|='1']").prop("checked", true);
         } else if (layout == 2) {
-          $("body").removeClass();
+          $("body").removeClass("light light-sidebar");
           $("body").addClass("dark");
           $("body").addClass("dark-sidebar");
-          $("body").addClass("theme-black");
-
-          $(".choose-theme li").removeClass("active");
-          $(".choose-theme li[title|='black']").addClass("active");
           $(".selectgroup-input-radio[value|='2']").prop("checked", true);
         }
         if (sidebar_color == 1) {

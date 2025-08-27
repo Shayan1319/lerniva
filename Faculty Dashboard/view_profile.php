@@ -94,7 +94,6 @@ $student_id = intval($_POST['id']);
     });
 
     function loadStudentProfile(studentId) {
-
         $.ajax({
             url: 'ajax/get_student.php',
             type: 'POST',
@@ -108,7 +107,7 @@ $student_id = intval($_POST['id']);
                     let c = response.data.class;
                     let subjects = response.data.subjects;
 
-                    // Set student details
+                    // 👉 Student details
                     $('#student_name').text(s.full_name);
                     $('#student_father').text(s.parent_name);
                     $('#student_roll').text(s.roll_number);
@@ -119,12 +118,12 @@ $student_id = intval($_POST['id']);
                     $('#student_address').text(s.address);
                     $('#student_photo').attr('src', s.profile_photo || 'assets/img/default.png');
 
-                    // Set class details
+                    // 👉 Class details
                     $('#class_name').text(c.class_name);
                     $('#class_section').text(c.section);
                     $('#class_teacher').text(c.teacher_name || '');
 
-                    // Colors for subject cards
+                    // 👉 Card background colors
                     let colors = [
                         'l-bg-green',
                         'l-bg-cyan',
@@ -133,34 +132,60 @@ $student_id = intval($_POST['id']);
                         'l-bg-red'
                     ];
 
-                    // Build subject cards
+                    // 👉 Build subject cards
                     let subjectHTML = '';
-                    subjects.forEach((sub, index) => { // FIXED syntax here
-                        const colorClass = colors[index % colors.length]; // Rotate through colors
+                    subjects.forEach((sub, index) => {
+                        const colorClass = colors[index % colors.length];
                         subjectHTML += `
-                    <div class="col-xl-3 col-lg-6">
-                        <div class="card ${colorClass}">
-                            <div class="card-statistic-3">
-                                <div class="card-icon card-icon-large"><i class="fa fa-book"></i></div>
-                                <div class="card-content">
-                                    <h4 class="card-title">${sub.period_name}</h4>
-                                    <span>${sub.teacher_name}</span>
-                                    <div class="text-warning">
-                                        ${'★'.repeat(sub.rating)}${'☆'.repeat(5 - sub.rating)}
-                                    </div>
-                                </div>
+        <div class="col-xl-3 col-lg-6">
+            <a href="javascript:void(0)" 
+               class="subject-card-link" 
+               data-id="${sub.id}" 
+               data-name="${sub.period_name}" 
+               data-teacher="${sub.teacher_name}">
+                <div class="card ${colorClass}">
+                    <div class="card-statistic-3">
+                        <div class="card-icon card-icon-large"><i class="fa fa-book"></i></div>
+                        <div class="card-content">
+                            <h4 class="card-title">${sub.period_name}</h4>
+                            <span>${sub.teacher_name}</span>
+                            <div class="text-warning">
+                                ${'★'.repeat(sub.rating)}${'☆'.repeat(5 - sub.rating)}
                             </div>
                         </div>
-                    </div>`;
+                    </div>
+                </div>
+            </a>
+        </div>`;
                     });
 
-                    // Inject into HTML
+
+                    // 👉 Inject cards into container
                     $('#subject_cards').html(subjectHTML);
+                } else {
+                    alert(response.message || "Error loading data");
                 }
+            },
+            error: function() {
+                alert("Failed to load student profile.");
             }
         });
     }
+
+    $(document).on('click', '.subject-card-link', function(e) {
+        e.preventDefault(); // prevent page reload
+        let subjectId = $(this).data('id');
+        let subjectName = $(this).data('name');
+        let teacher = $(this).data('teacher');
+
+        alert(
+            "Subject ID: " + subjectId +
+            "\nSubject: " + subjectName +
+            "\nTeacher: " + teacher
+        );
+    });
     </script>
+
 
 
 

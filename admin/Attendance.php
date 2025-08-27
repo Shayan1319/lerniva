@@ -9,23 +9,19 @@ if (!isset($_SESSION['admin_id'])) {
 
 $school_id = $_SESSION['admin_id'];
 ?>
+
 <style>
-#attendance {
+#attendanceData {
     padding-left: 20px;
-    position: relative;
-    color: #6777ef !important;
-    background-color: #f0f3ff;
+    background-color: #f0f3ff !important;
 }
 
-#attendance i {
+#attendanceData svg {
     color: #6777ef !important;
 }
 
-.profile-img {
-    width: 45px;
-    height: 45px;
-    object-fit: cover;
-    border-radius: 50%;
+#attendanceData span {
+    color: #6777ef !important;
 }
 </style>
 

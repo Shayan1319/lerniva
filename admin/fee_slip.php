@@ -6,6 +6,22 @@
     background-color: #f0f3ff;
 }
 
+#fee_type ul {
+    display: block !important;
+}
+
+#fee_type svg {
+    color: #6777ef !important;
+}
+
+#fee_type span {
+    color: #6777ef !important;
+}
+
+#FeeSlip {
+    color: #000;
+}
+
 @media print {
     .row {
         display: flex !important;

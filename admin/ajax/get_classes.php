@@ -11,7 +11,7 @@ if (!isset($_SESSION['admin_id'])) {
 
 $school_id = $_SESSION['admin_id'];
 
-$sql = "SELECT DISTINCT class_name FROM class_timetable_meta WHERE school_id = ?";
+$sql = "SELECT DISTINCT id, class_name FROM class_timetable_meta WHERE school_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $school_id);
 $stmt->execute();

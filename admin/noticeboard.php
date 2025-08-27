@@ -3,11 +3,18 @@ require_once 'assets/php/header.php';
 ?>
 
 <style>
-#apps {
+#app_link {
     padding-left: 20px;
-    position: relative;
-    color: #6777ef;
+    color: #6777ef !important;
     background-color: #f0f3ff;
+}
+
+#apps ul {
+    display: block !important;
+}
+
+#notice_board {
+    color: #000;
 }
 </style>
 

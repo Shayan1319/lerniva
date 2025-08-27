@@ -1,11 +1,11 @@
-<style>
-#apps {
-    padding-left: 20px;
-    position: relative;
-    color: #6777ef;
-    background-color: #f0f3ff;
-}
-</style>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let el = document.getElementById("test");
+    if (el) {
+        el.classList.add("active");
+    }
+});
+</script>
 
 <?php require_once 'assets/php/header.php'; ?>
 

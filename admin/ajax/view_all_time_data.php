@@ -29,7 +29,7 @@ if ($res_classes->num_rows > 0) {
 
         foreach ($days as $day) {
             // Get half-day info
-            $sql_day = "SELECT total_periods, is_half_day FROM class_timetable_weekdays WHERE timetable_id = $class_id AND weekday = '$day'";
+            $sql_day = "SELECT total_periods, is_half_day FROM class_timetable_weekdays WHERE school_id = $school_id AND weekday = '$day'";
             $day_res = $conn->query($sql_day);
             $total_periods = $max_p;
             if ($day_row = $day_res->fetch_assoc()) {

@@ -47,7 +47,8 @@ $stmt->bind_param(
     }
 
     if ($action == 'getAll') {
-        $res = $conn->query("SELECT * FROM faculty ORDER BY id DESC");
+       $res = $conn->query("SELECT * FROM faculty WHERE campus_id = $admin_id ORDER BY id DESC");
+
         $output = "<table class='table table-bordered'><thead><tr>
             <th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Type</th><th>Schedule</th><th>Action</th>
         </tr></thead><tbody>";

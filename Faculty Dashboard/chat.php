@@ -4,7 +4,28 @@ if (!isset($_SESSION['admin_id'])) {
   header("Location: logout.php");
   exit;
 }
+include_once('sass/db_config.php');
 
+$school_id = $_SESSION['admin_id']; // or dynamically get this if needed
+
+$sql = "SELECT id, full_name, photo FROM faculty WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $school_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$school = null;
+if ($result->num_rows > 0) {
+    $school = $result->fetch_assoc();
+} else {
+    // fallback/default values if no school found
+    $school = [
+        'id' => 0,
+        'full_name' => 'Default School Name',
+        'photo' => 'assets/img/default-logo.png'
+    ];
+}
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -36,12 +57,25 @@ if (!isset($_SESSION['admin_id'])) {
 
     <link rel='shortcut icon' type='image/x-icon' href='assets/img/T Logo.png' />
 </head>
+<style>
+#app_link {
+    padding-left: 20px;
+    color: #6777ef !important;
+    background-color: #f0f3ff;
+}
+
+#apps ul {
+    display: block !important;
+}
+
+#chat {
+    color: #000;
+}
+</style>
 
 <body>
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
-
-
             <div class="navbar-bg"></div>
             <nav class="navbar navbar-expand-lg main-navbar sticky">
                 <div class="form-inline mr-auto">
@@ -99,19 +133,18 @@ if (!isset($_SESSION['admin_id'])) {
                     </li>
                     <li class="dropdown"><a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image"
-                                src="assets/img/usman.jpeg" class="user-img-radious-style"> <span
-                                class="d-sm-none d-lg-inline-block"></span></a>
+                                src="uploads/profile/<?php echo htmlspecialchars($school['photo']); ?>"
+                                class="user-img-radious-style"> <span class="d-sm-none d-lg-inline-block"></span></a>
                         <div class="dropdown-menu dropdown-menu-right pullDown">
-                            <div class="dropdown-title">Hello Teacher</div>
+                            <div class="dropdown-title">Hello Admin</div>
                             <a href="profile.php" class="dropdown-item has-icon"> <i class="far
 										fa-user"></i> Profile
-                            </a> <a href="timeline.php" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>
-                                Activities
-                            </a> <a href="#" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>
+                            </a>
+                            <a href="profile.php?#settings" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>
                                 Settings
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a href="auth-login.php" class="dropdown-item has-icon text-danger"> <i
+                            <a href="logout.php" class="dropdown-item has-icon text-danger"> <i
                                     class="fas fa-sign-out-alt"></i>
                                 Logout
                             </a>
@@ -121,107 +154,81 @@ if (!isset($_SESSION['admin_id'])) {
             </nav>
             <div class="main-sidebar sidebar-style-2">
                 <aside id="sidebar-wrapper">
-                    <div class="sidebar-brand" style="margin-top: 10px; padding-left: 10px;">
-                        <a href="index.php" style="display: flex; align-items: center;">
-                            <img alt="image" src="assets/img/school logo.png" class="header-logo"
-                                style="height: 80px; width: auto; margin-top: 5px;" />
+                    <div class="sidebar-brand" style="margin-top: 16px; padding-left: 10px;   height: fit-content;">
+                        <a href="index.php">
+                            <img alt="image" src="uploads/profile/<?php echo htmlspecialchars($school['photo']); ?>"
+                                class="header-logo" style="width: 50px;border-radius: 50%;" />
                             <span class="logo-name"
-                                style="font-size: 25px; font-weight: bold; margin-left: 10px;">APS&C</span>
+                                style="font-size: 16px; font-weight: bold; margin-left: 10px;"><?php echo htmlspecialchars($school['full_name']); ?></span>
                         </a>
                     </div>
                     <ul class="sidebar-menu">
-                        <!-- <li class="menu-header">Main</li> -->
                         <li class="dropdown ">
                             <a href="index.php" class="nav-link"><i
                                     data-feather="monitor"></i><span>Dashboard</span></a>
                         </li>
-                        <!-- <li class="dropdown">
+                        <li class="dropdown">
                             <a href="#" class="menu-toggle nav-link has-dropdown"><i
                                     data-feather="bar-chart-2"></i><span>Graphs</span></a>
                             <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="widget-chart.php">Revenue / Cost Chart</a></li>
-                                <li><a class="nav-link" href="widget-data.php">Student Profile Visualization</a></li>
+                                <li><a class="nav-link" href="student-profile.php">Student Profile Visualization</a>
+                                </li>
                                 <li><a class="nav-link" href="academic.php">Academic Reporting</a></li>
-                                <li><a class="nav-link" href="socitiesclub.php">Societies Club</a></li>
                             </ul>
-                        </li> -->
+                        </li>
 
-                        <li class="dropdown">
-                            <a id="apps" href="#" class="menu-toggle nav-link has-dropdown"><i
+                        <li class="dropdown active">
+                            <a href="#" class="menu-toggle nav-link has-dropdown"><i
                                     data-feather="command"></i><span>Apps</span></a>
                             <ul class="dropdown-menu">
                                 <li><a class="nav-link" href="chat.php">Chat</a></li>
                                 <!-- <li><a class="nav-link" href="calendar.php">Calendar</a></li> -->
-                                <li><a class="nav-link" href="meeting_form.php">Meeting Scheduler</a></li>
-                                <li><a class="nav-link" href="noticeboard.php">Digital Notice Board</a></li>
-                                <li><a class="nav-link" href="students_list.php">Student</a></li>
-                                <li><a class="nav-link" href="assign_task.php">Assign task</a></li>
+                                <li><a class="nav-link" href="apply_leave.php"> Apply for leave</a></li>
+                                <li><a class="nav-link" href="meeting_request_form.php"> Apply for Meeting</a></li>
+                                <li><a class="nav-link" href="teacher_meetings.php"> Show Meeting</a></li>
                             </ul>
                         </li>
-                        <li class="dropdown active">
-                            <a id="attendance" href="Attendance.php" class="nav-link"
-                                style="background-color: transparent !important; box-shadow: none !important; color: black !important;">
-                                <i data-feather="edit" style="color: rgb(78, 77, 77) !important;"></i>
-                                <span style="color: rgb(78, 77, 77) !important;">Attendance</span>
+                        <li class="dropdown">
+                            <a href="#" class="menu-toggle nav-link has-dropdown">
+                                <i data-feather="clipboard"></i><span>Test / Assignment</span></a>
+                            <ul class="dropdown-menu">
+                                <li><a class="nav-link" href="assignment-test.php">Add</a></li>
+                                <li><a class="nav-link" href="assigment-result.php">Submit Result</a></li>
+                                <li><a class="nav-link" href="show-result.php">Results</a></li>
+                            </ul>
+                        </li>
+                        <!-- <li class="dropdown">
+                            <a href="assignment-test.php" class="nav-link">
+                                <i data-feather="clipboard"></i><span>Test / Assignment</span>
+                            </a>
+                        </li> -->
+                        <li class="dropdown">
+                            <a href="Dairy.php" class="nav-link">
+                                <i data-feather="book"></i><span>Dairy</span>
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="Attendance.php" class="nav-link">
+                                <i data-feather="edit"></i><span>Student Attendance</span>
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="leaved.php" class="nav-link">
+                                <i data-feather="log-out"></i><span>Student Leave</span>
+                            </a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="students_list.php" class="nav-link">
+                                <i data-feather="users"></i><span>See all student</span>
                             </a>
                         </li>
 
-                        <li class="dropdown">
-                            <a id="timetable" href="#" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="layout"></i><span>Time Table</span></a>
-                            <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="timetable.php">Create Time Table</a></li>
-                                <li><a class="nav-link" href="view_all_timetable.php">See Time Table</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a id="fee_type" href="#" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="layout"></i><span>Fee</span></a>
-                            <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="fee_slip.php">Fee Slip</a></li>
-                                <li><a class="nav-link" href="submit_student_fee.php">Submit Student Fee</a></li>
-                                <li><a class="nav-link" href="fee_period_form.php">Fee Period</a></li>
-                                <li><a class="nav-link" href="fee_strutter.php">Add Class Fee Plan</a></li>
-                                <li><a class="nav-link" href="show_fee_structures.php">View Class Fee Plan</a></li>
-                                <li><a class="nav-link" href="enroll_student_fee_plan.php">Student Fee Plan</a></li>
-                                <li><a class="nav-link" href="fee_structure_view.php">All Students Fee
-                                        Structure</a></li>
-                                <li><a class="nav-link" href="fee_type.php">Fee Type</a></li>
-                                <li><a class="nav-link" href="enroll_scholarship.php">Scholarship Form</a></li>
-                                <li><a class="nav-link" href="load_scholarships.php">Scholarship</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="mail"></i><span>Email</span></a>
-                            <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="email-inbox.php">Inbox</a></li>
-                                <li><a class="nav-link" href="email-compose.php">Compose</a></li>
-                                <li><a class="nav-link" href="email-read.php">read</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" id="facultyForm" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="layout"></i><span>Forms</span></a>
-                            <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="faculty_registration.php">Faculty Registration</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" id="Managements" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="grid"></i><span>Managements</span></a>
-                            <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="leaved.php">Leave Management</a></li>
-                            </ul>
-                        </li>
-
                     </ul>
                     </ul>
 
-                    <!-- Add space above the bottom logo -->
                     <div class="sidebar-brand" style="margin-top: 10px;">
                         <a href="index.php" style="display: flex; align-items: center;">
-                            <img alt="image" src="assets/img/Final Logo (1).jpg" class="header-logo"
+                            <img alt="image" src="assets/img/T Logo.png" class="header-logo"
                                 style="height: 80px; width: auto;" />
                             <span class="logo-name"
                                 style="font-size: 25px; font-weight: bold; margin-left: 10px; margin-top: 8px;">Lurniva</span>
@@ -230,13 +237,7 @@ if (!isset($_SESSION['admin_id'])) {
 
                 </aside>
             </div>
-            <style>
-            #app {
-                padding-left: 20px;
-                color: #6777ef !important;
-                background-color: #f0f3ff;
-            }
-            </style>
+
             <!-- Main Content -->
             <div class="main-content">
                 <section class="section">

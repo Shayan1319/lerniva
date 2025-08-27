@@ -1,12 +1,14 @@
 <?php require_once 'assets/php/header.php'; ?>
-<style>
-#dairyFormContainer {
-    padding: 20px;
-    background-color: #f7f8fc;
-    border-radius: 10px;
-    margin-bottom: 30px;
-}
-</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let el = document.getElementById("apps");
+    if (el) {
+        el.classList.add("active");
+    }
+});
+</script>
+
 
 <div class="main-content">
     <section class="section">

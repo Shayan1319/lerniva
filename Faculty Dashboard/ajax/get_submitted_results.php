@@ -2,27 +2,29 @@
 session_start();
 require_once '../sass/db_config.php';
 
-$school_id    = $_SESSION['campus_id'];
-$assignment_id = $_POST['assignment_id'] ?? 0;
+$school_id       = $_SESSION['campus_id'] ?? 0;
+$exam_schedule_id = $_POST['exam_schedule_id'] ?? 0;
 
-if (!$assignment_id) {
-    echo "<tr><td colspan='12'>No assignment selected</td></tr>";
+if (!$exam_schedule_id) {
+    echo "<tr><td colspan='11'>No exam selected</td></tr>";
     exit;
 }
 
-// Fetch student results along with student info and assignment info
 $sql = "
-    SELECT sr.*, s.full_name, s.roll_number, s.class_grade, s.section,
-           ta.subject, ta.type, ta.title, ta.due_date, ta.total_marks, ta.attachment AS assignment_attachment
-    FROM student_results sr
-    INNER JOIN students s ON s.id = sr.student_id
-    INNER JOIN teacher_assignments ta ON ta.id = sr.assignment_id
-    WHERE sr.school_id = ? AND sr.assignment_id = ?
+    SELECT er.id AS result_id, er.marks_obtained, er.remarks,
+           s.id AS student_id, s.full_name, s.roll_number, s.class_grade, s.section,
+           es.exam_date, es.total_marks AS subject_total, es.subject_id,
+           e.exam_name, e.total_marks AS exam_total
+    FROM exam_results er
+    INNER JOIN students s ON s.id = er.student_id
+    INNER JOIN exam_schedule es ON es.id = er.exam_schedule_id
+    INNER JOIN exams e ON e.id = es.exam_name   -- exam_name is exam_id FK
+    WHERE er.school_id = ? AND er.exam_schedule_id = ?
     ORDER BY s.class_grade, s.section, s.roll_number
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ii", $school_id, $assignment_id);
+$stmt->bind_param("ii", $school_id, $exam_schedule_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -30,26 +32,18 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
                 <td>{$row['student_id']}</td>
-                <td>{$row['full_name']}</td>
+                <td>" . htmlspecialchars($row['full_name']) . "</td>
                 <td>{$row['roll_number']}</td>
                 <td>{$row['class_grade']} - {$row['section']}</td>
-                <td>{$row['subject']}</td>
-                <td>{$row['type']}</td>
-                <td>{$row['title']}</td>
-                <td>{$row['due_date']}</td>
-                <td>{$row['total_marks']}</td>
+                <td>{$row['subject_id']}</td>
+                <td>" . htmlspecialchars($row['exam_name']) . "dfdsaf</td>
+                <td>" . date('d-M-Y', strtotime($row['exam_date'])) . "</td>
+                <td>{$row['subject_total']}</td>
                 <td>{$row['marks_obtained']}</td>
                 <td>{$row['remarks']}</td>
-                <td>";
-        if (!empty($row['attachment'])) {
-            echo "<a href='../uploads/{$row['attachment']}' target='_blank'>View</a>";
-        } elseif (!empty($row['assignment_attachment'])) {
-            echo "<a href='../uploads/{$row['assignment_attachment']}' target='_blank'>View</a>";
-        } else {
-            echo "N/A";
-        }
-        echo "</td></tr>";
+              </tr>";
     }
 } else {
-    echo "<tr><td colspan='12'>No submitted results found for this assignment</td></tr>";
+    echo "<tr><td colspan='11'>No submitted results found for this exam</td></tr>";
 }
+?>

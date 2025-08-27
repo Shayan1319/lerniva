@@ -1,99 +1,106 @@
-<style>
-#apps {
+ <style>
+#app_link {
     padding-left: 20px;
-    position: relative;
-    color: #6777ef;
+    color: #6777ef !important;
     background-color: #f0f3ff;
 }
-</style>
 
-<?php require_once 'assets/php/header.php';?>
-<!-- Main Content -->
-<div class="main-content">
-    <section class="section">
-        <div class="section-header">
-            <h2>Meeting Announcement</h2>
-        </div>
+#apps ul {
+    display: block !important;
+}
 
-        <div class="section-body">
-            <form id="meetingForm">
-                <input type="hidden" name="school_id" value="<?php echo $_SESSION['admin_id']; ?>">
+#meeting {
+    color: #000;
+}
+ </style>
 
-                <div class="mb-3">
-                    <label>Title</label>
-                    <input type="text" name="title" class="form-control" required>
-                </div>
+ <?php require_once 'assets/php/header.php';?>
+ <!-- Main Content -->
+ <div class="main-content">
+     <section class="section">
+         <div class="section-header">
+             <h2>Meeting Announcement</h2>
+         </div>
 
-                <div class="mb-3">
-                    <label>Agenda</label>
-                    <textarea name="meeting_agenda" class="form-control" id="agenda"></textarea>
-                </div>
+         <div class="section-body">
+             <form id="meetingForm">
+                 <input type="hidden" name="school_id" value="<?php echo $_SESSION['admin_id']; ?>">
 
-                <div class="mb-3">
-                    <label>Date</label>
-                    <input type="date" name="meeting_date" class="form-control" required>
-                </div>
+                 <div class="mb-3">
+                     <label>Title</label>
+                     <input type="text" name="title" class="form-control" required>
+                 </div>
 
-                <div class="mb-3">
-                    <label>Time</label>
-                    <input type="time" name="meeting_time" class="form-control" required>
-                </div>
+                 <div class="mb-3">
+                     <label>Agenda</label>
+                     <textarea name="meeting_agenda" class="form-control" id="agenda"></textarea>
+                 </div>
 
-                <div class="mb-3">
-                    <label>Organizer</label>
-                    <select name="meeting_person" id="meeting_person" class="form-control" required>
-                        <option value="">Select</option>
-                        <option value="admin">Admin</option>
-                        <option value="teacher">Teacher</option>
-                        <option value="parent">Parent</option>
-                    </select>
-                </div>
+                 <div class="mb-3">
+                     <label>Date</label>
+                     <input type="date" name="meeting_date" class="form-control" required>
+                 </div>
 
-                <div class="mb-3">
-                    <label>Organizer's ID</label>
-                    <select name="person_id_one" id="person_id_one" class="form-control" required>
-                        <option value="">Select Person</option>
-                    </select>
-                </div>
+                 <div class="mb-3">
+                     <label>Time</label>
+                     <input type="time" name="meeting_time" class="form-control" required>
+                 </div>
 
-                <div class="mb-3">
-                    <label>Audience</label>
-                    <select name="meeting_person2" id="meeting_person2" class="form-control" required>
-                        <option value="">Select</option>
-                        <option value="admin">Admin</option>
-                        <option value="teacher">Teacher</option>
-                        <option value="parent">Parent</option>
-                    </select>
-                </div>
+                 <div class="mb-3">
+                     <label>Organizer</label>
+                     <select name="meeting_person" id="meeting_person" class="form-control" required>
+                         <option value="">Select</option>
+                         <option value="admin">Admin</option>
+                         <option value="teacher">Teacher</option>
+                         <option value="parent">Parent</option>
+                     </select>
+                 </div>
 
-                <div class="mb-3">
-                    <label>Audience's ID</label>
-                    <select name="person_id_two" id="person_id_two" class="form-control" required>
-                        <option value="">Select Person</option>
-                    </select>
-                </div>
+                 <div class="mb-3">
+                     <label>Organizer's ID</label>
+                     <select name="person_id_one" id="person_id_one" class="form-control" required>
+                         <option value="">Select Person</option>
+                     </select>
+                 </div>
 
-                <div class="mb-3">
-                    <label>Type</label>
-                    <select name="status" class="form-control" id="meetingType" onchange="toggleMeetingType()">
-                        <option value="scheduled">Online</option>
-                        <option value="cancelled">Physical</option>
-                    </select>
-                </div>
+                 <div class="mb-3">
+                     <label>Audience</label>
+                     <select name="meeting_person2" id="meeting_person2" class="form-control" required>
+                         <option value="">Select</option>
+                         <option value="admin">Admin</option>
+                         <option value="teacher">Teacher</option>
+                         <option value="parent">Parent</option>
+                     </select>
+                 </div>
 
-                <button type="submit" class="btn btn-primary">Save Meeting</button>
-            </form>
+                 <div class="mb-3">
+                     <label>Audience's ID</label>
+                     <select name="person_id_two" id="person_id_two" class="form-control" required>
+                         <option value="">Select Person</option>
+                     </select>
+                 </div>
 
-            <div id="result" class="mt-3"></div>
-            <hr>
-            <h3>All Meetings</h3>
-            <div id="allMeetings"></div>
-        </div>
-    </section>
-</div>
+                 <div class="mb-3">
+                     <label>Type</label>
+                     <select name="status" class="form-control" id="meetingType" onchange="toggleMeetingType()">
+                         <option value="scheduled">Online</option>
+                         <option value="cancelled">Physical</option>
+                     </select>
+                 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script>
+                 <button type="submit" class="btn btn-primary">Save Meeting</button>
+             </form>
+
+             <div id="result" class="mt-3"></div>
+             <hr>
+             <h3>All Meetings</h3>
+             <div id="allMeetings"></div>
+         </div>
+     </section>
+ </div>
+
+ <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+ <script>
 $(document).ready(function() {
     loadMeetings();
 
@@ -187,6 +194,6 @@ function toggleMeetingType() {
         agenda.placeholder = "Include the agenda and the room number or location.";
     }
 }
-</script>
+ </script>
 
-<?php require_once 'assets/php/footer.php';?>
+ <?php require_once 'assets/php/footer.php';?>

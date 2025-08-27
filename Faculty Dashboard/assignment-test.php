@@ -1,12 +1,13 @@
 <?php require_once 'assets/php/header.php'; ?>
-<style>
-#apps {
-    padding-left: 20px;
-    position: relative;
-    color: #6777ef;
-    background-color: #f0f3ff;
-}
-</style>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let el = document.getElementById("test");
+    if (el) {
+        el.classList.add("active");
+    }
+});
+</script>
+
 
 <div class="main-content">
     <section class="section">
@@ -22,23 +23,20 @@
                 <div class="mb-3">
                     <label>Type</label>
                     <select name="type" class="form-control" required>
-                        <option value="">Select</option>
-                        <option value="Test">Test</option>
                         <option value="Assignment">Assignment</option>
+                        <option value="Test">Test</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label>Class</label>
                     <select name="class_id" id="classSelect" class="form-control" required>
-                        <option value="">Select Class</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label>Subject</label>
                     <select name="subject_id" id="subjectSelect" class="form-control" required>
-                        <option value="">Select Subject</option>
                     </select>
                 </div>
 

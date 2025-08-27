@@ -62,7 +62,7 @@ if (!empty($classes)) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
     $stmt_hd = $conn->prepare("INSERT INTO `class_timetable_weekdays` 
-        (`timetable_id`, `weekday`, `assembly_time`, `leave_time`, `total_periods`, `is_half_day`, `created_at`)
+        (`school_id`, `weekday`, `assembly_time`, `leave_time`, `total_periods`, `is_half_day`, `created_at`)
         VALUES (?, ?, ?, ?, ?, ?, ?)");
 
     $stmt_period = $conn->prepare("INSERT INTO `class_timetable_details` 
@@ -101,7 +101,7 @@ if (!empty($classes)) {
 
                     $stmt_hd->bind_param(
                         "issssis",
-                        $class_meta_id,
+                        $school_id,
                         $weekday,
                         $hd_assembly,
                         $hd_leave,

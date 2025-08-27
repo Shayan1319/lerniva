@@ -11,7 +11,7 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$school_id = $_SESSION['campus_id']; // TEMP: change if needed
+$school_id = $_SESSION['campus_id']; 
 $student_id = $_POST['student_id'] ?? 0;
 
 if (!$student_id) {
@@ -53,13 +53,14 @@ if ($class_data) {
     $class_data = ['class_name' => $student['class_grade'], 'section' => $student['section'], 'teacher_name' => ''];
 }
 
-// 3. Subjects
+// 3. Subjects with ID
 $subjects = [];
 if (!empty($class_data['id'])) {
-    $subjects_sql = "SELECT d.period_name, f.full_name as teacher_name, f.rating
+    $subjects_sql = "SELECT d.id, d.period_name, f.full_name as teacher_name, f.rating
                      FROM class_timetable_details d
                      JOIN faculty f ON d.teacher_id = f.id
-                     WHERE d.timing_meta_id = ?";
+                     WHERE d.timing_meta_id = ? 
+                       AND d.period_type != 'Break'";
     $stmt = $conn->prepare($subjects_sql);
     $stmt->bind_param("i", $class_data['id']);
     $stmt->execute();

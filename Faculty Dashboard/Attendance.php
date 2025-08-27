@@ -1,10 +1,18 @@
 <?php require_once 'assets/php/header.php'; ?>
 <style>
-#apps {
+#Attendance {
     padding-left: 20px;
     position: relative;
-    color: #6777ef;
+    color: #6777ef !important;
     background-color: #f0f3ff;
+}
+
+#Attendance svg {
+    color: #6777ef !important;
+}
+
+#Attendance span {
+    color: #6777ef !important;
 }
 </style>
 
@@ -16,55 +24,35 @@
         </div>
 
         <div class="section-body">
-            <!-- Test / Assignment Form -->
-            <form id="testAssignmentForm" enctype="multipart/form-data">
-                <input type="hidden" name="teacher_id" value="<?php echo $_SESSION['admin_id']; ?>">
+            <div class="form-group">
+                <label for="classSelect">Select Class:</label>
+                <select id="classSelect" class="form-control">
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="Date" name="date" id="date" class="form-control">
+            </div>
 
-                <div class="mb-3">
-                    <label>Type</label>
-                    <select name="type" class="form-control" required>
-                        <option value="">Select</option>
-                        <option value="Test">Test</option>
-                        <option value="Assignment">Assignment</option>
-                    </select>
-                </div>
+            <table class="table table-bordered" id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="text-center">Please select a class</td>
+                    </tr>
+                </tbody>
+            </table>
 
-                <div class="mb-3">
-                    <label>Title</label>
-                    <input type="text" name="title" class="form-control" placeholder="Enter title" required>
-                </div>
+            <button id="saveAttendance" class="btn btn-success d-none">Save Attendance</button>
 
-                <div class="mb-3">
-                    <label>Description</label>
-                    <textarea name="description" class="form-control" rows="3" placeholder="Enter details"
-                        required></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label>Due Date</label>
-                    <input type="date" name="due_date" class="form-control" required>
-                </div>
-
-                <div class="mb-3">
-                    <label>Total Marks</label>
-                    <input type="number" name="total_marks" class="form-control" placeholder="e.g. 100" required>
-                </div>
-
-                <div class="mb-3">
-                    <label>Attachment (Optional)</label>
-                    <input type="file" name="attachment" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label>Status</label>
-                    <select name="status" class="form-control" required>
-                        <option value="Active">Active</option>
-                        <option value="Draft">Draft</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Save</button>
-            </form>
 
             <div id="result" class="mt-3"></div>
             <hr>
@@ -77,74 +65,73 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function() {
-    loadTasks();
+    let today = new Date().toISOString().split('T')[0];
+    document.getElementById("date").value = today;
+    // Load classes on page load
+    $.ajax({
+        url: "ajax/teacher_classes.php", // your 2nd PHP snippet
+        type: "GET",
+        success: function(data) {
+            $("#classSelect").html(data);
+        }
+    });
 
-    // Submit form (insert/update)
-    $("#testAssignmentForm").on("submit", function(e) {
-        e.preventDefault();
-
-        var formData = new FormData(this);
-        var updateId = $("button[type=submit]").data("update-id");
-        formData.append("action", updateId ? "update" : "insert");
-        if (updateId) {
-            formData.append("id", updateId);
+    // When class changes, load unmarked students
+    $("#classSelect").change(function() {
+        let class_id = $(this).val();
+        if (class_id === "") {
+            $("#attendanceTable tbody").html(
+                "<tr><td colspan='5' class='text-center'>Please select a class</td></tr>");
+            $("#saveAttendance").addClass("d-none");
+            return;
         }
 
         $.ajax({
-            url: "ajax/test_assignment_crud.php",
-            method: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
+            url: "ajax/get_class_students.php", // your 1st PHP snippet
+            type: "GET",
+            data: {
+                class_id: class_id
+            },
             success: function(data) {
-                $("#result").html(data);
-                $("#testAssignmentForm")[0].reset();
-                $("button[type=submit]").text("Save").removeData("update-id");
-                loadTasks();
+                $("#attendanceTable tbody").html(data);
+                $("#saveAttendance").removeClass("d-none");
             }
         });
     });
 
-    // Load all
-    function loadTasks() {
-        $.post("ajax/test_assignment_crud.php", {
-            action: "getAll"
-        }, function(data) {
-            $("#allTasks").html(data);
-        });
-    }
+    // Save attendance
+    $("#saveAttendance").click(function() {
+        let class_id = $("#classSelect").val();
+        let date = $("#date").val();
 
-    // Edit
-    $(document).on("click", ".editTask", function() {
-        var id = $(this).data("id");
-        $.post("ajax/test_assignment_crud.php", {
-            id: id,
-            action: "getOne"
-        }, function(data) {
-            var t = JSON.parse(data);
-            $("select[name=type]").val(t.type);
-            $("input[name=title]").val(t.title);
-            $("textarea[name=description]").val(t.description);
-            $("input[name=due_date]").val(t.due_date);
-            $("input[name=total_marks]").val(t.total_marks);
-            $("select[name=status]").val(t.status);
-            $("button[type=submit]").text("Update").data("update-id", id);
+        // get all checked radios as array
+        let formData = $("#attendanceTable input[type=radio]:checked").serializeArray();
+
+        // convert to object: { student_id: status }
+        let statuses = {};
+        formData.forEach(item => {
+            // item.name looks like "status[5]"
+            let match = item.name.match(/status\[(\d+)\]/);
+            if (match) {
+                statuses[match[1]] = item.value;
+            }
+        });
+
+        $.ajax({
+            url: "ajax/save_attendance.php",
+            type: "POST",
+            data: {
+                class_id: class_id,
+                attendanceDate: date,
+                status: statuses
+            },
+            success: function(res) {
+                alert(res);
+                $("#classSelect").trigger("change");
+            }
         });
     });
 
-    // Delete
-    $(document).on("click", ".deleteTask", function() {
-        var id = $(this).data("id");
-        if (confirm("Are you sure you want to delete this?")) {
-            $.post("ajax/test_assignment_crud.php", {
-                id: id,
-                action: "delete"
-            }, function(data) {
-                $("#result").html(data);
-                loadTasks();
-            });
-        }
-    });
 });
 </script>
 

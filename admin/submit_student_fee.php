@@ -5,6 +5,22 @@
     color: #6777ef !important;
     background-color: #f0f3ff;
 }
+
+#fee_type ul {
+    display: block !important;
+}
+
+#fee_type svg {
+    color: #6777ef !important;
+}
+
+#fee_type span {
+    color: #6777ef !important;
+}
+
+#submit_student_fee {
+    color: #000;
+}
 </style>
 <div class="main-content">
     <section class="section">

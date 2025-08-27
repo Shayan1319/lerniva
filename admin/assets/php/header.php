@@ -61,6 +61,8 @@ $stmt->close();
 </head>
 
 <body>
+
+
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
 
@@ -139,6 +141,8 @@ $stmt->close();
                             </div>
                         </div>
                     </li>
+
+
                     <li class="dropdown"><a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image"
                                 src="uploads/logos/<?php echo htmlspecialchars($school['logo']); ?>"
@@ -148,7 +152,8 @@ $stmt->close();
                             <a href="profile.php" class="dropdown-item has-icon"> <i class="far
 										fa-user"></i> Profile
                             </a>
-                            <a href="profile.php?#settings" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>
+                            <a href="javascript:void(0)" class="dropdown-item settingPanelToggle"> <i
+                                    class="fas fa-cog"></i>
                                 Settings
                             </a>
                             <div class="dropdown-divider"></div>
@@ -187,49 +192,61 @@ $stmt->close();
                             </ul>
                         </li> -->
 
-                        <li class="dropdown">
-                            <a id="apps" href="#" class="menu-toggle nav-link has-dropdown"><i
+                        <li id="apps" class="dropdown">
+                            <a id="app_link" href="#" class="menu-toggle nav-link has-dropdown"><i
                                     data-feather="command"></i><span>Apps</span></a>
                             <ul class="dropdown-menu">
                                 <li><a class="nav-link" href="chat.php">Chat</a></li>
                                 <!-- <li><a class="nav-link" href="calendar.php">Calendar</a></li> -->
-                                <li><a class="nav-link" href="meeting_form.php">Meeting Scheduler</a></li>
-                                <li><a class="nav-link" href="noticeboard.php">Digital Notice Board</a></li>
-                                <li><a class="nav-link" href="students_list.php">Student</a></li>
-                                <li><a class="nav-link" href="assign_task.php">Assign task</a></li>
+                                <li><a id="meeting" class="nav-link" href="meeting_form.php">Meeting Scheduler</a></li>
+                                <li><a id="notice_board" class="nav-link" href="noticeboard.php">Digital Notice
+                                        Board</a></li>
+                                <li><a id="student_list" class="nav-link" href="students_list.php">Student</a></li>
+                                <li><a id="assign_task" class="nav-link" href="assign_task.php">Assign task</a></li>
                             </ul>
                         </li>
                         <li class="dropdown active">
-                            <a id="attendance" href="Attendance.php" class="nav-link"
-                                style="background-color: transparent !important; box-shadow: none !important; color: black !important;">
-                                <i data-feather="edit" style="color: rgb(78, 77, 77) !important;"></i>
-                                <span style="color: rgb(78, 77, 77) !important;">Attendance</span>
+                            <a id="attendanceData" href="Attendance.php" class="nav-link"
+                                style="background-color: transparent ; box-shadow: none ; color: black ;">
+                                <i data-feather="edit" style="color: rgb(78, 77, 77) ;"></i>
+                                <span style="color: rgb(78, 77, 77) ;">Attendance</span>
                             </a>
                         </li>
 
-                        <li class="dropdown">
+                        <li id="timetable" class="dropdown">
                             <a id="timetable" href="#" class="menu-toggle nav-link has-dropdown"><i
                                     data-feather="layout"></i><span>Time Table</span></a>
                             <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="timetable.php">Create Time Table</a></li>
-                                <li><a class="nav-link" href="view_all_timetable.php">See Time Table</a></li>
+                                <li><a id="createTT" class="nav-link" href="timetable.php">Create Time Table</a></li>
+                                <li><a id="seeTT" class="nav-link" href="view_all_timetable.php">See Time Table</a></li>
+                                <li><a id="createCE" class="nav-link" href="create_exam.php"> Create Exam</a></li>
+                                <li><a id="createAE" class="nav-link" href="add_exam.php"> Add Subject</a></li>
+                                <li><a id="seeDSV" class="nav-link" href="date_sheet_view.php"> See Date-Sheet</a></li>
                             </ul>
                         </li>
-                        <li class="dropdown">
-                            <a id="fee_type" href="#" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="layout"></i><span>Fee</span></a>
+                        <li id="fee_type" class="dropdown">
+                            <a href="#" class="menu-toggle nav-link has-dropdown"><i
+                                    data-feather="dollar-sign"></i><span>Fee</span></a>
                             <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="fee_slip.php">Fee Slip</a></li>
-                                <li><a class="nav-link" href="submit_student_fee.php">Submit Student Fee</a></li>
-                                <li><a class="nav-link" href="fee_period_form.php">Fee Period</a></li>
-                                <li><a class="nav-link" href="fee_strutter.php">Add Class Fee Plan</a></li>
-                                <li><a class="nav-link" href="show_fee_structures.php">View Class Fee Plan</a></li>
-                                <li><a class="nav-link" href="enroll_student_fee_plan.php">Student Fee Plan</a></li>
-                                <li><a class="nav-link" href="fee_structure_view.php">All Students Fee
+                                <li><a id="FeeSlip" class="nav-link" href="fee_slip.php">Fee Slip</a></li>
+                                <li><a id="submit_student_fee" class="nav-link" href="submit_student_fee.php">Submit
+                                        Student Fee</a></li>
+                                <li><a id="feePeriodForm" class="nav-link" href="fee_period_form.php">Fee Period</a>
+                                </li>
+                                <li><a id="fee_Strutter" class="nav-link" href="fee_strutter.php">Add Class Fee Plan</a>
+                                </li>
+                                <li><a id="show_fee_structures" class="nav-link" href="show_fee_structures.php">View
+                                        Class Fee Plan</a></li>
+                                <li><a id="enroll_student_fee_plan" class="nav-link"
+                                        href="enroll_student_fee_plan.php">Student Fee Plan</a></li>
+                                <li><a id="fee_structure_view" class="nav-link" href="fee_structure_view.php">All
+                                        Students Fee
                                         Structure</a></li>
-                                <li><a class="nav-link" href="fee_type.php">Fee Type</a></li>
-                                <li><a class="nav-link" href="enroll_scholarship.php">Scholarship Form</a></li>
-                                <li><a class="nav-link" href="load_scholarships.php">Scholarship</a></li>
+                                <li><a id="fee_type_data" class="nav-link" href="fee_type.php">Fee Type</a></li>
+                                <li><a id="enroll_scholarship" class="nav-link"
+                                        href="enroll_scholarship.php">Scholarship Form</a></li>
+                                <li><a id="load_scholarships" class="nav-link"
+                                        href="load_scholarships.php">Scholarship</a></li>
                             </ul>
                         </li>
                         <!-- <li class="dropdown">
@@ -241,19 +258,18 @@ $stmt->close();
                                 <li><a class="nav-link" href="email-read.php">read</a></li>
                             </ul>
                         </li> -->
+
+
                         <li class="dropdown">
-                            <a href="#" id="facultyForm" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="layout"></i><span>Forms</span></a>
-                            <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="faculty_registration.php">Faculty Registration</a></li>
-                            </ul>
+                            <a id="facultyForm" href="faculty_registration.php" id="Managements" class="nav-link"><i
+                                    data-feather="grid"></i><span>Faculty
+                                    Registration</span></a>
+
                         </li>
                         <li class="dropdown">
-                            <a href="#" id="Managements" class="menu-toggle nav-link has-dropdown"><i
-                                    data-feather="grid"></i><span>Managements</span></a>
-                            <ul class="dropdown-menu">
-                                <li><a class="nav-link" href="leaved.php">Leave Management</a></li>
-                            </ul>
+                            <a href="leaved.php" id="Managements" class="nav-link"><i
+                                    data-feather="grid"></i><span>Leave Managements</span></a>
+
                         </li>
 
                     </ul>

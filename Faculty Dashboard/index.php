@@ -1,4 +1,39 @@
 <?php require_once 'assets/php/header.php'; ?>
+<?php
+require_once 'sass/db_config.php';
+
+$teacher_id = $_SESSION['admin_id'] ?? 0;
+$school_id  = $_SESSION['campus_id'] ?? 0;
+
+
+$studentCount = 0;
+
+if ($teacher_id && $school_id) {
+    $sql = "
+        SELECT COUNT(DISTINCT s.id) as total_students
+        FROM students s
+        JOIN class_timetable_meta ctm 
+            ON s.class_grade = ctm.class_name 
+           AND s.section = ctm.section
+        JOIN class_timetable_details ctd 
+            ON ctm.id = ctd.timing_meta_id
+        WHERE ctd.teacher_id = ? AND s.school_id = ?
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $teacher_id, $school_id);
+    $stmt->execute();
+    $res = $stmt->get_result()->fetch_assoc();
+    $studentCount = $res['total_students'] ?? 0;
+    
+// Query to count assignments
+$sql = "SELECT COUNT(*) AS total_tasks FROM teacher_assignments  WHERE teacher_id =$teacher_id  AND school_id = $school_id";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+
+$total_tasks = $row['total_tasks']; // number of tasks
+
+}
+?>
 
 <style>
 #dashboard {
@@ -8,24 +43,18 @@
     background-color: #f0f3ff;
 }
 
-#dashboard i {
+#dashboard svg {
+    color: #6777ef !important;
+}
+
+#dashboard span {
     color: #6777ef !important;
 }
 </style>
 <!-- Main Content -->
 <div class="main-content">
     <section class="section">
-        <!-- Search + Scanner -->
-        <div class="row mb-4">
-            <div class="col-md-10 col-sm-9 col-12 mb-2">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search any ID or Code">
-            </div>
-            <div class="col-md-2 col-sm-3 col-12">
-                <button class="btn btn-primary btn-block" onclick="openScannerModal()">
-                    <i class="fas fa-qrcode"></i> Scan
-                </button>
-            </div>
-        </div>
+
 
         <style>
         .card:hover {
@@ -39,32 +68,33 @@
         <div class="row">
             <!-- Card 1 -->
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                <a href="see-all-student.html" style="text-decoration: none; color: inherit;">
-                    <div class="card">
-                        <div class="card-statistic-4">
-                            <div class="align-items-center justify-content-between">
-                                <div class="row">
-                                    <div class="col-lg-6 pr-0 pt-3">
-                                        <div class="card-content">
-                                            <h5 class="font-15">Total No. of Students</h5>
-                                            <h2 class="mb-3 font-18">54</h2>
-                                        </div>
+                <div class="card">
+                    <div class="card-statistic-4">
+                        <div class="align-items-center justify-content-between">
+                            <div class="row">
+                                <div class="col-lg-6 pr-0 pt-3">
+                                    <div class="card-content">
+                                        <h5 class="font-15">My Students</h5>
+                                        <h2 class="mb-3 font-18">
+                                            <?php echo $studentCount; ?>
+                                        </h2>
                                     </div>
-                                    <div class="col-lg-6 pl-0">
-                                        <div class="banner-img">
-                                            <img src="assets/img/student.png" alt="student">
-                                        </div>
+                                </div>
+                                <div class="col-lg-6 pl-0">
+                                    <div class="banner-img">
+                                        <img src="assets/img/student.png" alt="student">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
+
 
             <!-- Card 2 -->
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                <a href="student-profile.html" style="text-decoration: none; color: inherit;">
+                <a href="students_list.php" style="text-decoration: none; color: inherit;">
                     <div class="card">
                         <div class="card-statistic-4">
                             <div class="align-items-center justify-content-between">
@@ -89,7 +119,7 @@
 
             <!-- Card 3 -->
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                <a href="assignment-test.html" style="text-decoration: none; color: inherit;">
+                <a href="assignment-test.php" style="text-decoration: none; color: inherit;">
                     <div class="card">
                         <div class="card-statistic-4">
                             <div class="align-items-center justify-content-between">
@@ -97,7 +127,7 @@
                                     <div class="col-lg-6 pr-0 pt-3">
                                         <div class="card-content">
                                             <h5 class="font-15">Assignments</h5>
-                                            <h2 class="mb-3 font-18">12 Tasks</h2>
+                                            <h2 class="mb-3 font-18"><?php echo $total_tasks; ?> Tasks</h2>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 pl-0">
@@ -112,9 +142,10 @@
                 </a>
             </div>
 
+
             <!-- Card 4 -->
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                <a href="Dairy.html" style="text-decoration: none; color: inherit;">
+                <a href="Dairy.php" style="text-decoration: none; color: inherit;">
                     <div class="card">
                         <div class="card-statistic-4">
                             <div class="align-items-center justify-content-between">
@@ -139,111 +170,169 @@
         </div>
 
         <div class="row">
-            <div class="col-12 col-sm-12 col-lg-12">
-                <div class="card ">
+            <div class="col-12">
+                <div class="card">
                     <div class="card-header">
-                        <h4>Revenue chart</h4>
+                        <h4>Student Progress (Attendance / Exams / Tests)</h4>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-9">
-                                <div id="chart1"></div>
-                                <div class="row mb-0">
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="list-inline text-center">
-                                            <div class="list-inline-item p-r-30"><i data-feather="arrow-up-circle"
-                                                    class="col-green"></i>
-                                                <h5 class="m-b-0">51,587 PKR</h5>
-                                                <p class="text-muted font-14 m-b-0">Monthly</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="list-inline text-center">
-                                            <div class="list-inline-item p-r-30"><i data-feather="arrow-up-circle"
-                                                    class="col-green"></i>
-                                                <h5 class="mb-0 m-b-0">6,45,965 PKR</h5>
-                                                <p class="text-muted font-14 m-b-0">Yearly</p>
-                                            </div>
-                                        </div>
+                        <div id="TeacherProgressChart" style="min-height:350px;"></div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-3">
+                                <div class="list-inline text-center">
+                                    <div class="list-inline-item p-r-30">
+                                        <h6 class="m-b-0">Coverage</h6>
+                                        <small class="text-muted">Classes taught</small>
+                                        <div id="tp_classes" class="text-big">-</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3">
-                                <div class="row mt-5">
-                                    <div class="col-7 col-xl-7 mb-3">Total Students</div>
-                                    <div class="col-5 col-xl-5 mb-3">
-                                        <span class="text-big">1,554</span>
-                                        <sup class="col-green">+19%</sup>
+                            <div class="col-md-3">
+                                <div class="list-inline text-center">
+                                    <div class="list-inline-item p-r-30">
+                                        <h6 class="m-b-0">Students</h6>
+                                        <small class="text-muted">Unique taught</small>
+                                        <div id="tp_students" class="text-big">-</div>
                                     </div>
-                                    <div class="col-7 col-xl-7 mb-3">Total Income</div>
-                                    <div class="col-5 col-xl-5 mb-3">
-                                        <span class="text-big">6,45,965 PKR</span>
-                                        <sup class="col-green">38%</sup>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="list-inline text-center">
+                                    <div class="list-inline-item p-r-30">
+                                        <h6 class="m-b-0">Current Year</h6>
+                                        <small class="text-muted">Progress period</small>
+                                        <div id="tp_year" class="text-big">-</div>
                                     </div>
-                                    <div class="col-7 col-xl-7 mb-3">Total Teachers</div>
-                                    <div class="col-5 col-xl-5 mb-3">
-                                        <span class="text-big">29</span>
-                                        <sup class="col-green">+05%</sup>
-                                    </div>
-                                    <div class="col-7 col-xl-7 mb-3">Total Salararies</div>
-                                    <div class="col-5 col-xl-5 mb-3">
-                                        <span class="text-big">2,13,580 PKR</span>
-                                    </div>
-                                    <div class="col-7 col-xl-7 mb-3">Other Expenses</div>
-                                    <div class="col-5 col-xl-5 mb-3">
-                                        <span class="text-big">93,800 PKR</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="list-inline text-center">
+                                    <div class="list-inline-item p-r-30">
+                                        <h6 class="m-b-0">Last Update</h6>
+                                        <small class="text-muted">Server time</small>
+                                        <div id="tp_updated" class="text-big">-</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12 col-sm-12 col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Chart</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="chart4" class="chartsh"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-12 col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Chart</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="summary">
-                            <div class="summary-chart active" data-tab-group="summary-tab" id="summary-chart">
-                                <div id="chart3" class="chartsh"></div>
-                            </div>
-                            <div data-tab-group="summary-tab" id="summary-text">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-12 col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Chart</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="chart2" class="chartsh"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+        <!-- jQuery (required for $.ajax) -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- ApexCharts -->
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+        <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: "ajax/get_teacher_progress.php",
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if (res.status !== "success") {
+                        console.error(res);
+                        alert(res.message || "Failed to load teacher progress.");
+                        return;
+                    }
+
+                    // Fill meta info
+                    $("#tp_classes").text(res.meta.classes_count);
+                    $("#tp_students").text(res.meta.students_count);
+                    $("#tp_year").text(res.meta.year);
+                    $("#tp_updated").text(res.meta.generated_at);
+
+                    // Clear old chart if exists
+                    $("#TeacherProgressChart").html("");
+
+                    // Chart options
+                    var options = {
+                        chart: {
+                            type: "line",
+                            height: 350,
+                            toolbar: {
+                                show: false
+                            }
+                        },
+                        stroke: {
+                            curve: "smooth",
+                            width: 3
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        series: [{
+                                name: "Attendance %",
+                                data: res.series.attendance
+                            },
+                            {
+                                name: "Exam Avg %",
+                                data: res.series.exams
+                            },
+                            {
+                                name: "Test/Assignment Avg %",
+                                data: res.series.tests
+                            }
+                        ],
+                        xaxis: {
+                            categories: res.categories,
+                            labels: {
+                                style: {
+                                    colors: "#9aa0ac"
+                                }
+                            }
+                        },
+                        yaxis: {
+                            min: 0,
+                            max: 100,
+                            tickAmount: 5,
+                            title: {
+                                text: "Percentage (%)"
+                            },
+                            labels: {
+                                style: {
+                                    colors: "#9aa0ac"
+                                }
+                            }
+                        },
+                        legend: {
+                            position: "top",
+                            horizontalAlign: "right",
+                            offsetY: -5
+                        },
+                        tooltip: {
+                            y: {
+                                formatter: function(v) {
+                                    return v.toFixed(2) + "%"
+                                }
+                            }
+                        },
+                        colors: ["#00b894", "#0984e3", "#e17055"]
+                    };
+
+                    var chart = new ApexCharts(document.querySelector("#TeacherProgressChart"),
+                        options);
+                    chart.render();
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    alert("Error fetching teacher progress.");
+                }
+            });
+        });
+        </script>
+
+
+
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Task Table Record</h4>
+                        <h4>Assign Task Table</h4>
                         <div class="card-header-form">
                             <form>
                                 <div class="input-group">
@@ -258,71 +347,69 @@
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-striped">
-                                <tr>
-                                    <th class="text-center">
-                                        <div class="custom-checkbox custom-checkbox-table custom-control">
-                                            <input type="checkbox" data-checkboxes="mygroup" data-checkbox-role="dad"
-                                                class="custom-control-input" id="checkbox-all">
-                                            <label for="checkbox-all" class="custom-control-label">&nbsp;</label>
-                                        </div>
-                                    </th>
-                                    <th>Task Name</th>
-                                    <th>Task Status</th>
-                                    <th>Assigh Date</th>
-                                    <th>Due Date</th>
-                                    <th>Priority</th>
-                                    <th>Action</th>
-                                </tr>
-                                <tr>
-                                    <td class="p-0 text-center">
-                                        <div class="custom-checkbox custom-control">
-                                            <input type="checkbox" data-checkboxes="mygroup"
-                                                class="custom-control-input" id="checkbox-1">
-                                            <label for="checkbox-1" class="custom-control-label">&nbsp;</label>
-                                        </div>
-                                    </td>
-                                    <td>Preperation for Sports Gala</td>
-                                    <td class="align-middle">
-                                        <div class="progress-text">60%</div>
-                                        <div class="progress" data-height="6">
-                                            <div class="progress-bar bg-success" data-width="50%"></div>
-                                        </div>
-                                    </td>
-                                    <td>2025-04-20</td>
-                                    <td>2025-07-28</td>
-                                    <td>
-                                        <div class="badge badge-success">Low</div>
-                                    </td>
-                                    <td><a href="#" class="btn btn-outline-primary">Detail</a></td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0 text-center">
-                                        <div class="custom-checkbox custom-control">
-                                            <input type="checkbox" data-checkboxes="mygroup"
-                                                class="custom-control-input" id="checkbox-2">
-                                            <label for="checkbox-2" class="custom-control-label">&nbsp;</label>
-                                        </div>
-                                    </td>
-                                    <td>Mid-Term Examination</td>
-                                    <td class="align-middle">
-                                        <div class="progress-text">40%</div>
-                                        <div class="progress" data-height="6">
-                                            <div class="progress-bar bg-danger" data-width="40%"></div>
-                                        </div>
-                                    </td>
-                                    <td>2025-05-14</td>
-                                    <td>2025-10-21</td>
-                                    <td>
-                                        <div class="badge badge-danger">High</div>
-                                    </td>
-                                    <td><a href="#" class="btn btn-outline-primary">Detail</a></td>
-                                </tr>
+                                <thead>
+                                    <tr>
+                                        <th>Task Name</th>
+                                        <th>Members</th>
+                                        <th>Task Status</th>
+                                        <th>Assign Date</th>
+                                        <th>Due Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tasksTableBody"></tbody>
                             </table>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            loadTasks();
+        });
+
+        function loadTasks() {
+            $.ajax({
+                url: 'ajax/fetch_tasks.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        let html = '';
+                        response.data.forEach(function(task) {
+                            html += `
+                        <tr>
+                            <td>${task.task_title}</td>
+                            <td class="text-truncate">${task.members_html}</td>
+                            <td>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: ${task.task_completed_percent}%"></div>
+                                </div>
+                            </td>
+                            <td>${task.created_at}</td>
+                            <td>${task.due_date}</td>
+                            <td><form action="show_task.php" method="post" style="display:inline;" id="taskDetailForm-${task.id}">
+  <input type="hidden" name="id" value="${task.id}">
+  <button type="submit" class="btn btn-outline-primary">Detail</button>
+</form>
+</td>
+                        </tr>
+                    `;
+                        });
+                        $('#tasksTableBody').php(html);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert("Error: " + error);
+                }
+            });
+        }
+        </script>
     </section>
     <?php require_once 'assets/php/footer.php'; ?>

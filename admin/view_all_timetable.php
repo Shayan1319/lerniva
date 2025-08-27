@@ -2,13 +2,16 @@
 <style>
 #timetable {
     padding-left: 20px;
-    position: relative;
     color: #6777ef !important;
     background-color: #f0f3ff;
 }
 
-#timetable i {
-    color: #6777ef !important;
+#timetable ul {
+    display: block !important;
+}
+
+#seeTT {
+    color: #000;
 }
 </style>
 <div class="main-content">

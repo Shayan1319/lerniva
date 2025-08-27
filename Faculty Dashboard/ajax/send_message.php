@@ -3,7 +3,7 @@ session_start();
 require_once '../sass/db_config.php';
 
 // Configuration
-$school_id = $_SESSION['admin_id']; // Set dynamically if needed
+$school_id = $_SESSION['campus_id']; // Set dynamically if needed
 $sender_id = $_SESSION['admin_id'];
 $sender_designation = 'teacher';
 

@@ -36,17 +36,17 @@ if (!$result) {
 }
 
 while ($row = mysqli_fetch_assoc($result)) {
-    $isAdmin = strtolower($row['sender_designation']) === 'teacher';
+    $isAdmin = strtolower($row['sender_designation']) === 'admin';
   // Decide image path based on sender type
     if ($row['sender_designation'] === 'teacher') {
-        $path = '../admin/uploads/'; 
-        $imagePath = $path.'logos/'. $row['sender_image']; 
+        $path = '../Faculty Dashboard/uploads/'; 
+        $imagePath = $path.'profile/'. $row['sender_image']; 
     } elseif ($row['sender_designation'] === 'admin') {
         $path = 'uploads/'; 
         $imagePath = $path.'logos/'. $row['sender_image']; 
     } elseif ($row['sender_designation'] === 'student') {
-        $path = '../school/uploads/';
-        $imagePath = $path.'logos/'. $row['sender_image'];
+        $path = '../student/uploads/';
+        $imagePath = $path.'profile/'. $row['sender_image'];
     } else {
         $imagePath = 'assets/img/default-avatar.png'; // fallback
     }

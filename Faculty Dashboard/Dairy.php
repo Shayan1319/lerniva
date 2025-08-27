@@ -1,13 +1,20 @@
 <?php require_once 'assets/php/header.php'; ?>
 <style>
 #dairyFormContainer {
-    padding: 20px;
-    background-color: #f7f8fc;
-    border-radius: 10px;
-    margin-bottom: 30px;
+    padding-left: 20px;
+    position: relative;
+    color: #6777ef !important;
+    background-color: #f0f3ff;
+}
+
+#dairyFormContainer svg {
+    color: #6777ef !important;
+}
+
+#dairyFormContainer span {
+    color: #6777ef !important;
 }
 </style>
-
 <div class="main-content">
     <section class="section">
 

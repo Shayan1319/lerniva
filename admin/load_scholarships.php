@@ -9,8 +9,21 @@ $school_id = $_SESSION['admin_id'];
     color: #6777ef !important;
     background-color: #f0f3ff;
 }
-</style>
+#fee_type svg {
+    color: #6777ef !important;
+}
 
+#fee_type span {
+    color: #6777ef !important;
+}
+#fee_type ul {
+    display: block !important;
+}
+
+#load_scholarships {
+    color: #000;
+}
+</style>
 <div class="main-content">
     <div class="container">
         <h2>Scholarships</h2>

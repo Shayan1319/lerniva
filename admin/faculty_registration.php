@@ -80,7 +80,10 @@
     </section>
     <hr>
     <h3>All Faculty</h3>
-    <div id="facultyTable">Loading...</div>
+    <div class="table-responsive">
+
+        <div id="facultyTable">Loading...</div>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -117,6 +120,7 @@ $(document).ready(function() {
                 // You can decide the success condition
                 if (response.trim() === 'success') {
                     // Reset the form
+                    loadFaculty();
                     $('#facultyForm')[0].reset();
 
                     // Reset the submit button text and remove data attributes (if used for edit/update)
@@ -125,8 +129,6 @@ $(document).ready(function() {
                         .removeData('id')
                         .text('Register Faculty');
 
-                    // Reload faculty table
-                    loadFaculty();
                 } else {
                     alert('Server Response: ' + response);
                 }

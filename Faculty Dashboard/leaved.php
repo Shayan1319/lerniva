@@ -1,9 +1,19 @@
 <?php require_once 'assets/php/header.php'; ?>
 <style>
-#Managements {
+
+#leaved {
     padding-left: 20px;
+    position: relative;
     color: #6777ef !important;
     background-color: #f0f3ff;
+}
+
+#leaved svg {
+    color: #6777ef !important;
+}
+
+#leaved span {
+    color: #6777ef !important;
 }
 </style>
 <!-- Main Content -->

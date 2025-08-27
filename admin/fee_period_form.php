@@ -5,6 +5,22 @@
     color: #6777ef !important;
     background-color: #f0f3ff;
 }
+
+#fee_type ul {
+    display: block !important;
+}
+
+#fee_type svg {
+    color: #6777ef !important;
+}
+
+#fee_type span {
+    color: #6777ef !important;
+}
+
+#feePeriodForm {
+    color: #000;
+}
 </style>
 <!-- Main Content -->
 <div class="main-content">
@@ -16,7 +32,7 @@
         <div class="section-body">
             <form id="feePeriodForm">
                 <input type="hidden" name="id" id="id">
-                <input type="hidden" name="school_id" value="<?= $_SESSION['admin_id'] ?? 1 ?>">
+                <input type="hidden" name="school_id" value="<?= $_SESSION['admin_id']?>">
 
                 <div class="mb-3">
                     <label>Period Name</label>
@@ -44,7 +60,7 @@
                     <input type="date" name="end_date" id="end_date" class="form-control" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Save Fee Period</button>
+                <button type="button" id="submit" class="btn btn-primary">Save Fee Period</button>
                 <div id="response" class="mt-3"></div>
             </form>
 
@@ -55,23 +71,54 @@
 
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
         <script>
+        // initial table load
         loadTable();
 
-        $('#feePeriodForm').submit(function(e) {
+        // Save (insert/update) via explicit variables
+        $('#submit').on('click', function(e) {
             e.preventDefault();
+
+            // ✅ read values from inputs
+            const id = $('#id').val().trim(); // empty => INSERT, value => UPDATE
+            const school_id = $('input[name="school_id"]').val().trim(); // hidden field from PHP session
+            const period_name = $('#period_name').val().trim();
+            const period_type = $('#period_type').val();
+            const start_date = $('#start_date').val();
+            const end_date = $('#end_date').val();
+            const status = 'active'; // or read from a select if you add one
+
+            // quick front-end validation
+            if (!school_id || !period_name || !period_type || !start_date || !end_date) {
+                $('#response').html(`<div class="alert alert-danger">All fields are required.</div>`);
+                return;
+            }
+
             $.ajax({
                 type: 'POST',
                 url: 'ajax/save_fee_period.php',
-                data: $(this).serialize(),
+                data: {
+                    id,
+                    school_id,
+                    period_name,
+                    period_type,
+                    start_date,
+                    end_date,
+                    status
+                },
                 dataType: 'json',
                 success: function(res) {
                     $('#response').html(
                         `<div class="alert alert-${res.status}">${res.message}</div>`);
                     if (res.status === 'success') {
+                        loadTable();
                         $('#feePeriodForm')[0].reset();
                         $('#id').val('');
-                        loadTable();
                     }
+                },
+                error: function(xhr, status, error) {
+                    $('#response').html(
+                        `<div class="alert alert-danger">AJAX error: ${error}</div>`);
+                    console.error('AJAX error:', xhr.responseText || error);
                 }
             });
         });
@@ -79,21 +126,24 @@
         function loadTable() {
             $.get('ajax/fetch_fee_periods.php', function(data) {
                 $('#feePeriodTable').html(data);
+            }).fail(function(xhr, status, error) {
+                console.error('Load table error:', error);
             });
         }
 
-        function editPeriod(id) {
+        // keep your edit/delete helpers
+        window.editPeriod = function(id) {
             $.get('ajax/fetch_fee_periods.php?id=' + id, function(data) {
-                let p = JSON.parse(data);
+                const p = JSON.parse(data);
                 $('#id').val(p.id);
                 $('#period_name').val(p.period_name);
                 $('#period_type').val(p.period_type);
                 $('#start_date').val(p.start_date);
                 $('#end_date').val(p.end_date);
             });
-        }
+        };
 
-        function deletePeriod(id) {
+        window.deletePeriod = function(id) {
             if (confirm('Delete this period?')) {
                 $.post('ajax/delete_fee_period.php', {
                     id
@@ -102,6 +152,7 @@
                     loadTable();
                 }, 'json');
             }
-        }
+        };
         </script>
+
         <?php require_once 'assets/php/footer.php'; ?>

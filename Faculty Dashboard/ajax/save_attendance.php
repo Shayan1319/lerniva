@@ -7,9 +7,9 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 $teacher_id = $_SESSION['admin_id'];
-$school_id = $_SESSION['admin_id']; // Change if school_id is stored differently
+$school_id = $_SESSION['campus_id']; // Change if school_id is stored differently
 
-$class_id = $_POST['classSelect'] ?? '';
+$class_id = $_POST['class_id'] ?? '';
 $date = $_POST['attendanceDate'] ?? '';
 $statuses = $_POST['status'] ?? [];
 

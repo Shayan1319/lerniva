@@ -1,9 +1,18 @@
 <?php require_once 'assets/php/header.php'; ?>
 <style>
-#apps {
+#students_list {
     padding-left: 20px;
+    position: relative;
     color: #6777ef !important;
     background-color: #f0f3ff;
+}
+
+#students_list svg {
+    color: #6777ef !important;
+}
+
+#students_list span {
+    color: #6777ef !important;
 }
 </style>
 <!-- Main Content -->

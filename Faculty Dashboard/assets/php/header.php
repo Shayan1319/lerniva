@@ -148,7 +148,8 @@ $stmt->close();
                             <a href="profile.php" class="dropdown-item has-icon"> <i class="far
 										fa-user"></i> Profile
                             </a>
-                            <a href="profile.php?#settings" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>
+                            <a href="javascript:void(0)" class="dropdown-item settingPanelToggle"> <i
+                                    class="fas fa-cog"></i>
                                 Settings
                             </a>
                             <div class="dropdown-divider"></div>
@@ -171,11 +172,11 @@ $stmt->close();
                         </a>
                     </div>
                     <ul class="sidebar-menu">
-                        <li class="dropdown active">
+                        <li id="dashboard" class="dropdown">
                             <a href="index.php" class="nav-link"><i
                                     data-feather="monitor"></i><span>Dashboard</span></a>
                         </li>
-                        <li class="dropdown">
+                        <!-- <li class="dropdown">
                             <a href="#" class="menu-toggle nav-link has-dropdown"><i
                                     data-feather="bar-chart-2"></i><span>Graphs</span></a>
                             <ul class="dropdown-menu">
@@ -183,25 +184,29 @@ $stmt->close();
                                 </li>
                                 <li><a class="nav-link" href="academic.php">Academic Reporting</a></li>
                             </ul>
-                        </li>
+                        </li> -->
 
-                        <li class="dropdown">
+                        <li id="apps" class="dropdown">
                             <a href="#" class="menu-toggle nav-link has-dropdown"><i
                                     data-feather="command"></i><span>Apps</span></a>
                             <ul class="dropdown-menu">
                                 <li><a class="nav-link" href="chat.php">Chat</a></li>
-                                <li><a class="nav-link" href="calendar.php">Calendar</a></li>
-                                <li><a class="nav-link" href="apply_leave.php"> Apply for leave</a></li>
+                                <!-- <li><a class="nav-link" href="calendar.php">Calendar</a></li> -->
+                                <li><a id="apply_leave" class="nav-link" href="apply_leave.php"> Apply for leave</a>
+                                </li>
                                 <li><a class="nav-link" href="meeting_request_form.php"> Apply for Meeting</a></li>
+                                <li><a class="nav-link" href="teacher_meetings.php"> Show Meeting</a></li>
                             </ul>
                         </li>
-                        <li class="dropdown">
+                        <li id="test" class="dropdown">
                             <a href="#" class="menu-toggle nav-link has-dropdown">
                                 <i data-feather="clipboard"></i><span>Test / Assignment</span></a>
                             <ul class="dropdown-menu">
                                 <li><a class="nav-link" href="assignment-test.php">Add</a></li>
                                 <li><a class="nav-link" href="assigment-result.php">Submit Result</a></li>
                                 <li><a class="nav-link" href="show-result.php">Results</a></li>
+                                <li><a class="nav-link" href="exam_results.php">Exam Results</a></li>
+                                <li><a class="nav-link" href="show-exam-result.php">View Exam Results</a></li>
                             </ul>
                         </li>
                         <!-- <li class="dropdown">
@@ -209,22 +214,22 @@ $stmt->close();
                                 <i data-feather="clipboard"></i><span>Test / Assignment</span>
                             </a>
                         </li> -->
-                        <li class="dropdown">
+                        <li id="dairyFormContainer" class="dropdown">
                             <a href="Dairy.php" class="nav-link">
                                 <i data-feather="book"></i><span>Dairy</span>
                             </a>
                         </li>
-                        <li class="dropdown">
+                        <li id="Attendance" class="dropdown">
                             <a href="Attendance.php" class="nav-link">
                                 <i data-feather="edit"></i><span>Student Attendance</span>
                             </a>
                         </li>
-                        <li class="dropdown">
+                        <li id="leaved" class="dropdown">
                             <a href="leaved.php" class="nav-link">
                                 <i data-feather="log-out"></i><span>Student Leave</span>
                             </a>
                         </li>
-                        <li class="dropdown">
+                        <li id="students_list" class="dropdown">
                             <a href="students_list.php" class="nav-link">
                                 <i data-feather="users"></i><span>See all student</span>
                             </a>

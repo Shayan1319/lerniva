@@ -1,9 +1,18 @@
 <?php require_once 'assets/php/header.php'; ?>
+
 <style>
-#apps {
+#app_link {
     padding-left: 20px;
     color: #6777ef !important;
     background-color: #f0f3ff;
+}
+
+#apps ul {
+    display: block !important;
+}
+
+#student_list {
+    color: #000;
 }
 </style>
 <!-- Main Content -->

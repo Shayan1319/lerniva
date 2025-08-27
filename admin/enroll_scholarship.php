@@ -5,11 +5,25 @@ $school_id = $_SESSION['admin_id'];
 <style>
 #fee_type {
     padding-left: 20px;
-    color: #6777ef !important;
     background-color: #f0f3ff;
 }
-</style>
 
+#fee_type svg {
+    color: #6777ef !important;
+}
+
+#fee_type span {
+    color: #6777ef !important;
+}
+
+#fee_type ul {
+    display: block !important;
+}
+
+#enroll_scholarship {
+    color: #000;
+}
+</style>
 <!-- Main Content -->
 <div class="main-content">
     <div class="container">

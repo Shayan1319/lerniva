@@ -16,8 +16,9 @@ if ($teacher_id > 0) {
     $stmt->bind_param("i", $teacher_id);
     $stmt->execute();
     $result = $stmt->get_result();
-
+    
     $options = '';
+    $options .='<option value="">Select</option>';
     while ($row = $result->fetch_assoc()) {
         $options .= '<option value="' . $row['id'] . '">' 
                     . htmlspecialchars($row['class_name'] . ' - ' . $row['section']) 

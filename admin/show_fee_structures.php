@@ -4,6 +4,29 @@ require 'sass/db_config.php';
 
 $feeTypes = $conn->query("SELECT id, fee_name FROM fee_types WHERE school_id = " . $_SESSION['admin_id']);
 ?>
+<style>
+#fee_type {
+    padding-left: 20px;
+    color: #6777ef !important;
+    background-color: #f0f3ff;
+}
+
+#fee_type svg {
+    color: #6777ef !important;
+}
+
+#fee_type span {
+    color: #6777ef !important;
+}
+
+#fee_type ul {
+    display: block !important;
+}
+
+#show_fee_structures {
+    color: #000;
+}
+</style>
 
 <div class="main-content">
     <section class="section">
