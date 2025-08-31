@@ -28,7 +28,8 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse("https://bm-boundaries-trunk-printed.trycloudflare.com/Lurniva/lerniva/api/login_api.php"),
+        Uri.parse(
+            "https://bm-boundaries-trunk-printed.trycloudflare.com/Lurniva/lerniva/api/login_api.php"),
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
@@ -63,12 +64,15 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => TeacherDashboard(   // ✅ Fixed
+              builder: (context) => TeacherDashboard(
+                // ✅ Fixed
                 teacherName: data['full_name'] ?? 'Teacher',
                 teacherDescription: "Welcome back!",
-                courseName: "Mathematics",   // replace with API value if available
+                courseName:
+                    "Mathematics", // replace with API value if available
                 classId: "T-${data['id']}", // or actual ID from API
-                profileImageUrl: "https://your-server.com/uploads/${data['photo'] ?? 'default.png'}",
+                profileImageUrl:
+                    "https://your-server.com/uploads/${data['photo'] ?? 'default.png'}",
               ),
             ),
           );
@@ -127,11 +131,13 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset('assets/images/logo_dark.png', height: 80, width: 80),
+                        Image.asset('assets/images/logo_dark.png',
+                            height: 80, width: 80),
                         const SizedBox(height: 10),
                         const GradientText(
                           'Lurniva',
-                          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
                           gradient: LinearGradient(colors: [
                             Color(0xFF3B38FF),
                             Color(0xFF4C9AFF),
@@ -154,30 +160,43 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     SizedBox(height: size.height * 0.45 + 20),
                     const Text('Welcome Back',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
                     const SizedBox(height: 6),
-                    const Text('Log in to your Lurniva account', style: TextStyle(color: Colors.white70)),
+                    const Text('Log in to your Lurniva account',
+                        style: TextStyle(color: Colors.white70)),
                     const SizedBox(height: 24),
-
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
                           TextFormField(
-                            decoration: _inputDecoration('Email or Username', Icons.email_outlined),
-                            validator: (value) => value == null || value.isEmpty ? 'Please enter your email/username' : null,
+                            decoration: _inputDecoration(
+                                'Email or Username', Icons.email_outlined),
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Please enter your email/username'
+                                : null,
                             onSaved: (value) => email = value!.trim(),
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
                             obscureText: obscurePassword,
-                            decoration: _inputDecoration('Password', Icons.lock_outline).copyWith(
+                            decoration:
+                                _inputDecoration('Password', Icons.lock_outline)
+                                    .copyWith(
                               suffixIcon: IconButton(
-                                icon: Icon(obscurePassword ? Icons.visibility_off : Icons.visibility),
-                                onPressed: () => setState(() => obscurePassword = !obscurePassword),
+                                icon: Icon(obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility),
+                                onPressed: () => setState(
+                                    () => obscurePassword = !obscurePassword),
                               ),
                             ),
-                            validator: (value) => value == null || value.isEmpty ? 'Please enter your password' : null,
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Please enter your password'
+                                : null,
                             onSaved: (value) => password = value!.trim(),
                           ),
 
@@ -191,18 +210,27 @@ class _LoginPageState extends State<LoginPage> {
                                 backgroundColor: Colors.transparent,
                                 shadowColor: Colors.transparent,
                                 padding: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
                               child: Ink(
                                 decoration: const BoxDecoration(
-                                  gradient: LinearGradient(colors: [Color(0xFF3B38FF), Color(0xFF00CFC1)]),
-                                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                                  gradient: LinearGradient(colors: [
+                                    Color(0xFF3B38FF),
+                                    Color(0xFF00CFC1)
+                                  ]),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12)),
                                 ),
                                 child: Container(
                                   alignment: Alignment.center,
                                   child: isLoading
-                                      ? const CircularProgressIndicator(color: Colors.white)
-                                      : const Text('Login', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                      ? const CircularProgressIndicator(
+                                          color: Colors.white)
+                                      : const Text('Login',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white)),
                                 ),
                               ),
                             ),
@@ -213,7 +241,8 @@ class _LoginPageState extends State<LoginPage> {
                             alignment: Alignment.centerRight,
                             child: TextButton(
                               onPressed: () {},
-                              child: const Text('Forgot your password?', style: TextStyle(color: Colors.white)),
+                              child: const Text('Forgot your password?',
+                                  style: TextStyle(color: Colors.white)),
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -222,7 +251,8 @@ class _LoginPageState extends State<LoginPage> {
                               Expanded(child: Divider(color: Colors.white)),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: Text("OR", style: TextStyle(color: Colors.white)),
+                                child: Text("OR",
+                                    style: TextStyle(color: Colors.white)),
                               ),
                               Expanded(child: Divider(color: Colors.white)),
                             ],
@@ -234,25 +264,31 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton.icon(
-                                icon: const Icon(Icons.g_mobiledata, size: 28, color: Colors.white),
+                                icon: const Icon(Icons.g_mobiledata,
+                                    size: 28, color: Colors.white),
                                 label: const Text('Google'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF4285F4),
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
                                 ),
                                 onPressed: () {},
                               ),
                               const SizedBox(width: 16),
                               ElevatedButton.icon(
-                                icon: const Icon(Icons.account_circle, color: Colors.white),
+                                icon: const Icon(Icons.account_circle,
+                                    color: Colors.white),
                                 label: const Text('Microsoft'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.indigo,
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
                                 ),
                                 onPressed: () {},
                               ),
@@ -262,7 +298,8 @@ class _LoginPageState extends State<LoginPage> {
                           TextButton(
                             onPressed: () => Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const SignUpPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => const SignUpPage()),
                             ),
                             child: const Text(
                               "Don't have an account? Sign Up",
@@ -299,12 +336,14 @@ class GradientText extends StatelessWidget {
   final TextStyle style;
   final Gradient gradient;
 
-  const GradientText(this.text, {super.key, required this.style, required this.gradient});
+  const GradientText(this.text,
+      {super.key, required this.style, required this.gradient});
 
   @override
   Widget build(BuildContext context) {
     return ShaderMask(
-      shaderCallback: (bounds) => gradient.createShader(Offset.zero & bounds.size),
+      shaderCallback: (bounds) =>
+          gradient.createShader(Offset.zero & bounds.size),
       child: Text(text, style: style.copyWith(color: Colors.white)),
     );
   }
@@ -316,7 +355,8 @@ class OvalBottomClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, size.height - 60);
-    path.quadraticBezierTo(size.width / 2, size.height, size.width, size.height - 60);
+    path.quadraticBezierTo(
+        size.width / 2, size.height, size.width, size.height - 60);
     path.lineTo(size.width, 0);
     path.close();
     return path;

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 
 // Import your pages
 import 'pages/student_page.dart';
@@ -58,11 +58,8 @@ class _MyAppState extends State<MyApp> {
 
       routes: {
         '/': (context) => const SplashScreen(),
-
         '/login': (context) => const LoginPage(),
-
         '/signup': (context) => const SignUpPage(),
-
         '/teacher': (context) => const TeacherDashboard(
               teacherName: "John Doe",
               teacherDescription: "Mathematics Teacher",
@@ -70,7 +67,6 @@ class _MyAppState extends State<MyApp> {
               classId: "10-A",
               profileImageUrl: "https://i.pravatar.cc/150?img=47",
             ),
-
         '/student': (context) => StudentPage(
               toggleTheme: _toggleTheme,
               themeMode: _themeMode,

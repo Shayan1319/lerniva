@@ -27,11 +27,27 @@ $student_id = esc($conn, $student_id);
 $school_condition = "AND school_id = '$school_id'";
 
 // 1. PERIOD ID only
+// 1. PERIOD ID only
 if (!empty($period_id) && empty($student_id) && empty($class_grade)) {
-    $period_query = "SELECT * FROM fee_periods WHERE id = '$period_id' AND id NOT IN (
-        SELECT fee_period_id FROM fee_slip_details WHERE school_id = '$school_id'
-    ) $school_condition";
+    $period_query = "
+        SELECT * 
+        FROM fee_periods p
+        WHERE p.id = '$period_id'
+          AND p.school_id = '$school_id'
+          AND EXISTS (
+              SELECT 1 
+              FROM students s
+              WHERE s.school_id = p.school_id
+                AND NOT EXISTS (
+                    SELECT 1 
+                    FROM fee_slip_details f
+                    WHERE f.fee_period_id = p.id
+                      AND f.student_id = s.id
+                      AND f.school_id = p.school_id
+                )
+          )";
 }
+
 
 // 2. STUDENT ID only
 elseif (!empty($student_id) && empty($period_id) && empty($class_grade)) {

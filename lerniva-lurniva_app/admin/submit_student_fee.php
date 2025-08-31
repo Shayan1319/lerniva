@@ -87,7 +87,8 @@ $(document).ready(function() {
 
         if (studentId) {
             $.post('ajax/get_net_payable.php', {
-                student_id: studentId
+                student_id: studentId,
+                fee_period_id: periodId
             }, function(res) {
                 if (res.status === 'success') {
                     $('#amount_paid').val(res.net_amount);
