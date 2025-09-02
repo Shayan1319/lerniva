@@ -4,7 +4,28 @@ if (!isset($_SESSION['admin_id'])) {
   header("Location: logout.php");
   exit;
 }
+include_once('sass/db_config.php');
 
+$school_id = $_SESSION['admin_id']; // or dynamically get this if needed
+
+$sql = "SELECT id, school_name, logo FROM schools WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $school_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$school = null;
+if ($result->num_rows > 0) {
+    $school = $result->fetch_assoc();
+} else {
+    // fallback/default values if no school found
+    $school = [
+        'id' => 0,
+        'school_name' => 'Default School Name',
+        'logo' => 'assets/img/default-logo.png'
+    ];
+}
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -99,19 +120,19 @@ if (!isset($_SESSION['admin_id'])) {
                     </li>
                     <li class="dropdown"><a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image"
-                                src="assets/img/usman.jpeg" class="user-img-radious-style"> <span
-                                class="d-sm-none d-lg-inline-block"></span></a>
+                                src="uploads/logos/<?php echo htmlspecialchars($school['logo']); ?>"
+                                class="user-img-radious-style"> <span class="d-sm-none d-lg-inline-block"></span></a>
                         <div class="dropdown-menu dropdown-menu-right pullDown">
                             <div class="dropdown-title">Hello Admin</div>
                             <a href="profile.php" class="dropdown-item has-icon"> <i class="far
 										fa-user"></i> Profile
-                            </a> <a href="timeline.php" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>
-                                Activities
-                            </a> <a href="#" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>
+                            </a>
+                            <a href="javascript:void(0)" class="dropdown-item settingPanelToggle"> <i
+                                    class="fas fa-cog"></i>
                                 Settings
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a href="auth-login.php" class="dropdown-item has-icon text-danger"> <i
+                            <a href="logout.php" class="dropdown-item has-icon text-danger"> <i
                                     class="fas fa-sign-out-alt"></i>
                                 Logout
                             </a>
@@ -121,12 +142,12 @@ if (!isset($_SESSION['admin_id'])) {
             </nav>
             <div class="main-sidebar sidebar-style-2">
                 <aside id="sidebar-wrapper">
-                    <div class="sidebar-brand" style="margin-top: 10px; padding-left: 10px;">
-                        <a href="index.php" style="display: flex; align-items: center;">
-                            <img alt="image" src="assets/img/school logo.png" class="header-logo"
-                                style="height: 80px; width: auto; margin-top: 5px;" />
+                    <div class="sidebar-brand" style="margin-top: 16px; padding-left: 10px;   height: fit-content;">
+                        <a href="index.php">
+                            <img alt="image" src="uploads/logos/<?php echo htmlspecialchars($school['logo']); ?>"
+                                class="header-logo" style="width: 50px;border-radius: 50%;" />
                             <span class="logo-name"
-                                style="font-size: 25px; font-weight: bold; margin-left: 10px;">APS&C</span>
+                                style="font-size: 16px; font-weight: bold; margin-left: 10px;"><?php echo htmlspecialchars($school['school_name']); ?></span>
                         </a>
                     </div>
                     <ul class="sidebar-menu">
@@ -1474,6 +1495,28 @@ if (!isset($_SESSION['admin_id'])) {
             }
 
             load_setting();
+            // =====================
+            // Search Contacts
+            // =====================
+            $('.chat-search input').on('keyup', function() {
+                let keyword = $(this).val();
+
+                if (keyword.length > 1) {
+                    $.ajax({
+                        url: 'ajax/search_contacts.php',
+                        type: 'POST',
+                        data: {
+                            keyword: keyword
+                        },
+                        success: function(response) {
+                            $('.chat-list').html(response);
+                        }
+                    });
+                } else {
+                    loadChatContacts(); // reload all if search box empty
+                }
+            });
+
         });
         </script>
 

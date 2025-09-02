@@ -621,6 +621,28 @@ document.addEventListener("DOMContentLoaded", function() {
                     loadChatMessages(currentChatId, currentChatDesignation);
                 }
             }, 3000);
+            $('.chat-search input').on('keyup', function() {
+                const keyword = $(this).val().trim();
+
+                if (keyword.length > 0) {
+                    $.ajax({
+                        url: 'ajax/search_contacts.php',
+                        type: 'POST',
+                        data: {
+                            keyword: keyword
+                        },
+                        success: function(response) {
+                            $('.chat-list').html(response);
+                        },
+                        error: function() {
+                            $('.chat-list').html('<li>Error searching contacts</li>');
+                        }
+                    });
+                } else {
+                    // Reload default contact list when search is empty
+                    loadChatContacts();
+                }
+            });
 
         });
         </script>

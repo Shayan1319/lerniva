@@ -231,6 +231,10 @@ $stmt->close();
                                 <li><a id="FeeSlip" class="nav-link" href="fee_slip.php">Fee Slip</a></li>
                                 <li><a id="submit_student_fee" class="nav-link" href="submit_student_fee.php">Submit
                                         Student Fee</a></li>
+                                <li><a id="Installments" class="nav-link" href="installments.php">Installments</a>
+                                <li><a id="installment_slips" class="nav-link" href="installment_slips.php">Installment
+                                        Slips</a>
+                                </li>
                                 <li><a id="feePeriodForm" class="nav-link" href="fee_period_form.php">Fee Period</a>
                                 </li>
                                 <li><a id="fee_Strutter" class="nav-link" href="fee_strutter.php">Add Class Fee Plan</a>
@@ -247,6 +251,11 @@ $stmt->close();
                                         href="enroll_scholarship.php">Scholarship Form</a></li>
                                 <li><a id="load_scholarships" class="nav-link"
                                         href="load_scholarships.php">Scholarship</a></li>
+                                <li><a id="load_scholarships" class="nav-link"
+                                        href="load_scholarships.php">Scholarship</a></li>
+                                <li><a id="get_submitted_fees" class="nav-link" href="get_submitted_fees.php">Submitted
+                                        Fee
+                                    </a></li>
                             </ul>
                         </li>
                         <!-- <li class="dropdown">
