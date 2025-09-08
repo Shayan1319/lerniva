@@ -32,6 +32,7 @@ $types = 'i' . $types;
 $stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
+
 echo "<table class='table table-bordered table-striped table-hover'>
 <thead class='table-dark text-white'>
 <tr>
@@ -42,8 +43,9 @@ echo "<table class='table table-bordered table-striped table-hover'>
   <th>Roll No</th>
   <th>QR Code</th>
   <th>Status</th>
-  <th>Download</th>
-  <th>View Profile</th> <!-- New column -->
+  <th>View Profile</th>
+  <th>Migration</th>
+  <th>Promote</th>
 </tr>
 </thead><tbody>";
 
@@ -66,7 +68,7 @@ while ($row = $result->fetch_assoc()) {
     ], JSON_UNESCAPED_UNICODE);
 
     $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?data=" . rawurlencode($jsonData) . "&size=150x150";
-    $downloadLink = "download_single_qr.php?id=" . $row['id'];
+   
 
     echo "<tr>
         <td><img src='uploads/profile/{$row['profile_photo']}' width='60' height='60' style='object-fit:cover'></td>
@@ -85,12 +87,17 @@ while ($row = $result->fetch_assoc()) {
                 <option value='Pending Verification' " . ($row['status'] == 'Pending Verification' ? 'selected' : '') . ">Pending Verification</option>
             </select>
         </td>
-        <td><a href='{$downloadLink}' class='btn btn-sm btn-primary' target='_blank'>Download</a></td>
         <td>
             <form action='view_profile.php' method='POST'>
                 <input type='hidden' name='id' value='{$row['id']}'>
                 <button type='submit' class='btn btn-sm btn-info'>View</button>
             </form>
+        </td>
+        <td>
+            <button class='btn btn-sm btn-warning migrate-btn' data-id='{$row['id']}'>Migrate</button>
+        </td>
+        <td>
+            <button class='btn btn-sm btn-success promote-btn' data-id='{$row['id']}'>Promote</button>
         </td>
     </tr>";
 }

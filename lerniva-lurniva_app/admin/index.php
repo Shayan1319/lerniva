@@ -410,8 +410,4 @@
         }
         </script>
     </section>
-
-
-
-
     <?php require_once 'assets/php/footer.php'; ?>
