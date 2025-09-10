@@ -128,7 +128,7 @@ function loadStudentQRTable() {
 $(document).ready(function() {
     loadStudentQRTable();
 
-    $(document).on('change', '.status-control', function() {
+    $(document).on('change', '#status-select', function() {
         const id = $(this).data('id');
         const newStatus = $(this).val();
 

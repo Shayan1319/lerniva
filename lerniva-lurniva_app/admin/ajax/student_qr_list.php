@@ -81,10 +81,9 @@ while ($row = $result->fetch_assoc()) {
             <small><strong>{$row['full_name']}</strong><br>{$row['class_grade']} - {$row['section']}<br>Roll: {$row['roll_number']}</small>
         </td>
         <td>
-            <select class='form-select status-select' data-id='{$row['id']}'>
-                <option value='Active' " . ($row['status'] == 'Active' ? 'selected' : '') . ">Active</option>
-                <option value='Inactive' " . ($row['status'] == 'Inactive' ? 'selected' : '') . ">Inactive</option>
-                <option value='Pending Verification' " . ($row['status'] == 'Pending Verification' ? 'selected' : '') . ">Pending Verification</option>
+            <select class='form-select status-select' id='status-select' data-id='{$row['id']}'>
+                <option value='Approved' " . ($row['status'] == 'Approved' ? 'selected' : '') . ">Approved</option>
+                <option value='Pending' " . ($row['status'] == 'Pending' ? 'selected' : '') . ">Pending Verification</option>
             </select>
         </td>
         <td>

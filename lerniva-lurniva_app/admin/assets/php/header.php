@@ -199,6 +199,8 @@ $stmt->close();
                                 <li><a class="nav-link" href="chat.php">Chat</a></li>
                                 <!-- <li><a class="nav-link" href="calendar.php">Calendar</a></li> -->
                                 <li><a id="meeting" class="nav-link" href="meeting_form.php">Meeting Scheduler</a></li>
+                                <li><a id="meeting_requests" class="nav-link" href="meeting_requests.php">Meeting
+                                        Requested</a></li>
                                 <li><a id="notice_board" class="nav-link" href="noticeboard.php">Digital Notice
                                         Board</a></li>
                                 <li><a id="student_list" class="nav-link" href="students_list.php">Student</a></li>
@@ -281,7 +283,6 @@ $stmt->close();
 
                         </li>
 
-                    </ul>
                     </ul>
 
                     <!-- Add space above the bottom logo -->

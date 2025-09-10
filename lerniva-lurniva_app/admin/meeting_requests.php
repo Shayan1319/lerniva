@@ -19,7 +19,7 @@ $result = mysqli_query($conn, $sql);
     display: block !important;
 }
 
-#meeting {
+#meeting_requests {
     color: #000;
 }
 </style>
