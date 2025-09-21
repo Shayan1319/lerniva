@@ -13,6 +13,7 @@ function sendMail($to, $subject, $message) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
+    $current_date = date("Y-m-d");
 
     if (empty($email) || empty($password)) {
         echo "<script>alert('Email and password are required.'); window.location.href='login.php';</script>";
@@ -55,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // --- ✅ Check Schools ---
     $stmt = $conn->prepare("
-        SELECT id, school_name, admin_contact_person, password, is_verified, status 
+        SELECT id, school_name, admin_contact_person, password, is_verified, status, subscription_end 
         FROM schools 
         WHERE school_email = ?
     ");
@@ -66,9 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result && $result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // 🚨 Block login if not approved
-        if ($user['status'] !== 'Approved') {
-            echo "<script>alert('Your school is not approved yet. Please wait for approval.'); window.location.href='login.php';</script>";
+        // 🚨 Check subscription expiry
+        if (!empty($user['subscription_end']) && $user['subscription_end'] < $current_date) {
+            $conn->query("UPDATE schools SET status='Pending' WHERE id=" . $user['id']);
+            echo "<script>alert('Your school subscription has expired. Please renew to continue.'); window.location.href='login.php';</script>";
             exit;
         }
 
@@ -106,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // --- ✅ Check Faculty ---
     $stmt = $conn->prepare("
-        SELECT id, campus_id, full_name, email, password, photo, is_verified, status 
+        SELECT id, campus_id, full_name, email, password, photo, is_verified, status, subscription_end 
         FROM faculty 
         WHERE email = ?
     ");
@@ -117,9 +119,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result && $result->num_rows === 1) {
         $faculty = $result->fetch_assoc();
 
-        // 🚨 Block login if not approved
-        if ($faculty['status'] !== 'Approved') {
-            echo "<script>alert('Your faculty account is not approved yet. Please wait for approval.'); window.location.href='login.php';</script>";
+        // 🚨 Check subscription expiry
+        if (!empty($faculty['subscription_end']) && $faculty['subscription_end'] < $current_date) {
+            $conn->query("UPDATE faculty SET status='Pending' WHERE id=" . $faculty['id']);
+            echo "<script>alert('Your faculty subscription has expired. Please renew to continue.'); window.location.href='login.php';</script>";
             exit;
         }
 
@@ -158,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // --- ✅ Check Students ---
     $stmt = $conn->prepare("
-        SELECT id, school_id, full_name, email, password, profile_photo, is_verified, status 
+        SELECT id, school_id, full_name, email, password, profile_photo, is_verified, status, subscription_end 
         FROM students
         WHERE email = ?
     ");
@@ -169,9 +172,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result && $result->num_rows === 1) {
         $student = $result->fetch_assoc();
 
-        // 🚨 Block login if not approved
-        if ($student['status'] !== 'Approved') {
-            echo "<script>alert('Your student account is not approved yet. Please wait for approval.'); window.location.href='login.php';</script>";
+        // 🚨 Check subscription expiry
+        if (!empty($student['subscription_end']) && $student['subscription_end'] < $current_date) {
+            $conn->query("UPDATE students SET status='Pending' WHERE id=" . $student['id']);
+            echo "<script>alert('Your student subscription has expired. Please renew to continue.'); window.location.href='login.php';</script>";
             exit;
         }
 
@@ -195,6 +199,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (sendMail($email, $subject, $msg)) {
                     $_SESSION['pending_email'] = $email;
                     $_SESSION['user_type'] = 'student';
+                    header("Location: verify.php");
+                    exit;
+                } else {
+                    echo "<script>alert('Failed to send verification email.'); window.location.href='login.php';</script>";
+                    exit;
+                }
+            }
+        } else {
+            echo "<script>alert('Invalid password.'); window.location.href='login.php';</script>";
+            exit;
+        }
+    }
+
+    // --- ✅ Check Parents ---
+    $stmt = $conn->prepare("
+        SELECT id, full_name, parent_cnic, email, phone, profile_photo, password, status, is_verified, subscription_end 
+        FROM parents 
+        WHERE email = ?
+    ");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows === 1) {
+        $parent = $result->fetch_assoc();
+
+        // 🚨 Check subscription expiry
+        if (!empty($parent['subscription_end']) && $parent['subscription_end'] < $current_date) {
+            $conn->query("UPDATE parents SET status='Pending' WHERE id=" . $parent['id']);
+            echo "<script>alert('Your parent subscription has expired. Please renew to continue.'); window.location.href='login.php';</script>";
+            exit;
+        }
+
+        if (password_verify($password, $parent['password'])) {
+            if ($parent['is_verified'] == 1) {
+                $_SESSION['parent_id']    = $parent['id'];
+                $_SESSION['parent_name']  = $parent['full_name'];
+                $_SESSION['parent_cnic']  = $parent['parent_cnic'];
+                $_SESSION['parent_phone'] = $parent['phone'];
+                $_SESSION['parent_photo'] = $parent['profile_photo'];
+
+                header("Location: parent/index.php");
+                exit;
+            } else {
+                // resend OTP
+                $verification_code = rand(100000, 999999);
+                $expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
+                $conn->query("UPDATE parents SET verification_code='$verification_code', code_expires_at='$expiry' WHERE id=".$parent['id']);
+
+                $subject = "Parent Account Verification";
+                $msg = "Hello {$parent['full_name']},\n\nYour verification code is: $verification_code\n\nThis code expires in 5 minutes.";
+
+                if (sendMail($email, $subject, $msg)) {
+                    $_SESSION['pending_email'] = $email;
+                    $_SESSION['user_type']     = 'parent';
                     header("Location: verify.php");
                     exit;
                 } else {

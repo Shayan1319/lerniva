@@ -61,7 +61,7 @@ while ($row = $result->fetch_assoc()) {
         'section' => $row['section'],
         'roll_number' => $row['roll_number'],
         'email' => $row['email'],
-        'parent_email' => $row['parent_email'],
+        'parent_email' => $row['parent_cnic'],
         'phone' => $row['phone'],
         'address' => $row['address'],
         'status' => $row['status']
@@ -71,7 +71,7 @@ while ($row = $result->fetch_assoc()) {
    
 
     echo "<tr>
-        <td><img src='uploads/profile/{$row['profile_photo']}' width='60' height='60' style='object-fit:cover'></td>
+        <td><img src='../student/uploads/profile/{$row['profile_photo']}' width='60' height='60' style='object-fit:cover'></td>
         <td>{$row['full_name']}</td>
         <td>{$row['parent_name']}</td>
         <td>{$row['class_grade']} - {$row['section']}</td>

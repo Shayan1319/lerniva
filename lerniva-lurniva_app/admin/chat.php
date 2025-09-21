@@ -6,9 +6,11 @@ if (!isset($_SESSION['admin_id'])) {
 }
 include_once('sass/db_config.php');
 
-$school_id = $_SESSION['admin_id']; // or dynamically get this if needed
+$school_id = $_SESSION['admin_id']; 
 
-$sql = "SELECT id, school_name, logo FROM schools WHERE id = ?";
+$sql = "SELECT id, username AS school_name, logo, subscription_end, status 
+        FROM schools 
+        WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $school_id);
 $stmt->execute();
@@ -17,6 +19,25 @@ $result = $stmt->get_result();
 $school = null;
 if ($result->num_rows > 0) {
     $school = $result->fetch_assoc();
+
+    $today = date("Y-m-d");
+
+    // 🚨 Check subscription expiry
+    if (!empty($school['subscription_end']) && $school['subscription_end'] < $today) {
+        
+        // If still marked Approved → set to Pending
+        if ($school['status'] === 'Approved') {
+            $update = $conn->prepare("UPDATE schools SET status = 'Pending' WHERE id = ?");
+            $update->bind_param("i", $school_id);
+            $update->execute();
+            $update->close();
+        }
+
+        // Force logout
+        header("Location: logout.php");
+        exit;
+    }
+
 } else {
     // fallback/default values if no school found
     $school = [
@@ -27,6 +48,11 @@ if ($result->num_rows > 0) {
 }
 $stmt->close();
 ?>
+<?php
+include_once("check_module_access.php");
+checkModule($conn, $_SESSION['admin_id'], 'chat');
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
