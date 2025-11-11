@@ -1,65 +1,88 @@
 <?php
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once '../sass/db_config.php';
 
-$action = $_REQUEST['action'] ?? '';
+if (!isset($_SESSION['admin_id'])) {
+    echo "<tr><td colspan='5' class='text-center text-danger'>Unauthorized access</td></tr>";
+    exit;
+}
 
-if($action == "save"){
+$admin_id = $_SESSION['admin_id']; // School ID for this admin
+$action = $_REQUEST['action'] ?? 'read'; // ✅ Default to 'read' when not provided
+
+if ($action == "save") {
     $id = $_POST['id'] ?? '';
-    $name = $_POST['exam_name'];
-    $marks = $_POST['total_marks'];
+    $name = trim($_POST['exam_name'] ?? '');
+    $marks = intval($_POST['total_marks'] ?? 0);
 
-    if($id){ // Update
-        $stmt = $conn->prepare("UPDATE exams SET exam_name=?, total_marks=? WHERE id=?");
-        $stmt->bind_param("sii", $name, $marks, $id);
+    if ($name == '' || $marks <= 0) {
+        echo json_encode(["status" => "error", "message" => "Please fill all fields."]);
+        exit;
+    }
+
+    if ($id) {
+        // ✅ Update existing exam
+        $stmt = $conn->prepare("UPDATE exams SET exam_name = ?, total_marks = ? WHERE id = ? AND school_id = ?");
+        $stmt->bind_param("siii", $name, $marks, $id, $admin_id);
         $ok = $stmt->execute();
-        echo json_encode(["status"=>$ok?"success":"error","message"=>$ok?"Updated":"Failed"]);
-    } else { // Insert
-        $stmt = $conn->prepare("INSERT INTO exams (exam_name,total_marks) VALUES (?,?)");
-        $stmt->bind_param("si", $name, $marks);
+        echo json_encode(["status" => $ok ? "success" : "error", "message" => $ok ? "Exam updated successfully." : "Update failed."]);
+    } else {
+        // ✅ Insert new exam
+        $stmt = $conn->prepare("INSERT INTO exams (school_id, exam_name, total_marks, created_at) VALUES (?, ?, ?, NOW())");
+        $stmt->bind_param("isi", $admin_id, $name, $marks);
         $ok = $stmt->execute();
-        echo json_encode(["status"=>$ok?"success":"error","message"=>$ok?"Inserted":"Failed"]);
+        echo json_encode(["status" => $ok ? "success" : "error", "message" => $ok ? "Exam added successfully." : "Insert failed."]);
     }
     exit;
 }
 
-if($action == "read"){
-    $res = $conn->query("SELECT * FROM exams ORDER BY id DESC");
-    $rows="";
-    while($r=$res->fetch_assoc()){
-        $rows.="<tr>
+if ($action == "get") {
+    $id = intval($_GET['id'] ?? 0);
+    $stmt = $conn->prepare("SELECT * FROM exams WHERE id = ? AND school_id = ?");
+    $stmt->bind_param("ii", $id, $admin_id);
+    $stmt->execute();
+    $res = $stmt->get_result()->fetch_assoc();
+
+    if ($res) {
+        echo json_encode(["status" => "success", "data" => $res]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Exam not found."]);
+    }
+    exit;
+}
+
+if ($action == "delete") {
+    $id = intval($_POST['id'] ?? 0);
+    $stmt = $conn->prepare("DELETE FROM exams WHERE id = ? AND school_id = ?");
+    $stmt->bind_param("ii", $id, $admin_id);
+    $ok = $stmt->execute();
+    echo json_encode(["status" => $ok ? "success" : "error", "message" => $ok ? "Exam deleted successfully." : "Delete failed."]);
+    exit;
+}
+
+// ✅ Default action: READ
+$stmt = $conn->prepare("SELECT id, exam_name, total_marks, created_at FROM exams WHERE school_id = ? ORDER BY id DESC");
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    while ($r = $result->fetch_assoc()) {
+        echo "<tr>
             <td>{$r['id']}</td>
             <td>{$r['exam_name']}</td>
             <td>{$r['total_marks']}</td>
+            <td>{$r['created_at']}</td>
             <td>
                 <button class='btn btn-sm btn-info editBtn' data-id='{$r['id']}'>Edit</button>
                 <button class='btn btn-sm btn-danger deleteBtn' data-id='{$r['id']}'>Delete</button>
             </td>
         </tr>";
     }
-    echo $rows ?: "<tr><td colspan='4'>No exams found</td></tr>";
-    exit;
-}
-
-if($action == "get"){
-    $id = $_GET['id'];
-    $stmt = $conn->prepare("SELECT * FROM exams WHERE id=?");
-    $stmt->bind_param("i",$id);
-    $stmt->execute();
-    $res = $stmt->get_result()->fetch_assoc();
-    if($res){
-        echo json_encode(["status"=>"success","data"=>$res]);
-    } else {
-        echo json_encode(["status"=>"error","message"=>"Not found"]);
-    }
-    exit;
-}
-
-if($action == "delete"){
-    $id = $_POST['id'];
-    $stmt = $conn->prepare("DELETE FROM exams WHERE id=?");
-    $stmt->bind_param("i",$id);
-    $ok = $stmt->execute();
-    echo json_encode(["status"=>$ok?"success":"error","message"=>$ok?"Deleted":"Failed"]);
-    exit;
+} else {
+    echo "<tr><td colspan='5' class='text-center'>No exams found.</td></tr>";
 }
 ?>

@@ -1,4 +1,10 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/php_error.log');
+
 session_start();
 require_once '../sass/db_config.php';
 
@@ -129,8 +135,7 @@ if (!empty($classes)) {
                     $is_break = $p['is_break'] ? 1 : 0;
                     $period_type = $p['period_type'];
 
-                    $stmt_period->bind_param(
-                        "iisssiiisi",
+                    $stmt_period->bind_param("iissssiisi",
                         $class_meta_id,
                         $period_num,
                         $period_name,

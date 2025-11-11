@@ -1,14 +1,16 @@
 <?php
-require_once 'admin/sass/db_config.php';
+require_once '../admin/sass/db_config.php';
+require_once '../mail_library.php'; // ✅ include your PHPMailer library
 
 // --- CORS CONFIGURATION ---
 $allowedOrigins = ($_SERVER['HTTP_HOST'] === 'dashboard.lurniva.com')
-    ? ['https://lurniva.com', 'https://www.lurniva.com']
+    ? ['https://dashboard.lurniva.com/login.php', 'https://www.dashboard.lurniva.com/login.php']
     : [
         'http://localhost:8080',
         'http://localhost:8081',
         'http://localhost:3000',
-        'http://localhost:5173'
+        'http://localhost:5173',
+        'http://localhost:60706'
     ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -24,15 +26,6 @@ header("Content-Type: application/json");
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
-}
-
-// --- Send Email Function (using PHP mail, domain lurniva) ---
-function sendMail($to, $subject, $message) {
-    $from = "noreply@dashboard.lurniva.com"; // use Lurniva domain email
-    $headers  = "From: $from\r\n";
-    $headers .= "Reply-To: $from\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
-    return mail($to, $subject, $message, $headers);
 }
 
 // --- Only allow POST ---
@@ -68,7 +61,7 @@ if ($result && $result->num_rows === 1) {
     $faculty = $result->fetch_assoc();
 
     // Subscription check
-    if (!empty($faculty['subscription_end']) && $faculty['subscription_end'] < $current_date) {
+    if (empty($faculty['subscription_end']) || $faculty['subscription_end'] < $current_date) {
         $conn->query("UPDATE faculty SET status='Pending' WHERE id=" . $faculty['id']);
         echo json_encode(["status" => "error", "message" => "Faculty subscription expired. Please renew."]);
         exit;
@@ -97,8 +90,15 @@ if ($result && $result->num_rows === 1) {
         $expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
         $conn->query("UPDATE faculty SET verification_code='$otp', code_expires_at='$expiry' WHERE id=" . $faculty['id']);
 
-        sendMail($faculty['email'], "Faculty Account Verification", 
-            "Hello {$faculty['full_name']},\n\nYour OTP is: $otp\n\nThis code expires in 5 minutes.");
+        $body = "
+            <h2>Faculty Account Verification</h2>
+            <p>Hello <strong>{$faculty['full_name']}</strong>,</p>
+            <p>Your OTP is: <strong>$otp</strong></p>
+            <p>This code expires in <b>5 minutes</b>.</p>
+            <p>– Lurniva Support</p>
+        ";
+
+        sendMail($faculty['email'], "Faculty Account Verification", $body);
 
         echo json_encode([
             "status" => "verify_required",
@@ -124,7 +124,7 @@ $result = $stmt->get_result();
 if ($result && $result->num_rows === 1) {
     $student = $result->fetch_assoc();
 
-    if (!empty($student['subscription_end']) && $student['subscription_end'] < $current_date) {
+    if (empty($student['subscription_end']) || $student['subscription_end'] < $current_date) {
         $conn->query("UPDATE students SET status='Pending' WHERE id=" . $student['id']);
         echo json_encode(["status" => "error", "message" => "Student subscription expired. Please renew."]);
         exit;
@@ -153,8 +153,15 @@ if ($result && $result->num_rows === 1) {
         $expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
         $conn->query("UPDATE students SET verification_code='$otp', code_expires_at='$expiry' WHERE id=" . $student['id']);
 
-        sendMail($student['email'], "Student Account Verification", 
-            "Hello {$student['full_name']},\n\nYour OTP is: $otp\n\nThis code expires in 5 minutes.");
+        $body = "
+            <h2>Student Account Verification</h2>
+            <p>Hello <strong>{$student['full_name']}</strong>,</p>
+            <p>Your OTP is: <strong>$otp</strong></p>
+            <p>This code expires in <b>5 minutes</b>.</p>
+            <p>– Lurniva Support</p>
+        ";
+
+        sendMail($student['email'], "Student Account Verification", $body);
 
         echo json_encode([
             "status" => "verify_required",
@@ -180,7 +187,7 @@ $result = $stmt->get_result();
 if ($result && $result->num_rows === 1) {
     $parent = $result->fetch_assoc();
 
-    if (!empty($parent['subscription_end']) && $parent['subscription_end'] < $current_date) {
+    if (empty($parent['subscription_end']) || $parent['subscription_end'] < $current_date) {
         $conn->query("UPDATE parents SET status='Pending' WHERE id=" . $parent['id']);
         echo json_encode(["status" => "error", "message" => "Parent subscription expired. Please renew."]);
         exit;
@@ -210,8 +217,15 @@ if ($result && $result->num_rows === 1) {
         $expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
         $conn->query("UPDATE parents SET verification_code='$otp', code_expires_at='$expiry' WHERE id=" . $parent['id']);
 
-        sendMail($parent['email'], "Parent Account Verification", 
-            "Hello {$parent['full_name']},\n\nYour OTP is: $otp\n\nThis code expires in 5 minutes.");
+        $body = "
+            <h2>Parent Account Verification</h2>
+            <p>Hello <strong>{$parent['full_name']}</strong>,</p>
+            <p>Your OTP is: <strong>$otp</strong></p>
+            <p>This code expires in <b>5 minutes</b>.</p>
+            <p>– Lurniva Support</p>
+        ";
+
+        sendMail($parent['email'], "Parent Account Verification", $body);
 
         echo json_encode([
             "status" => "verify_required",

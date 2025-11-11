@@ -1,28 +1,5 @@
-<?php require_once 'assets/php/header.php'; 
-include_once('sass/db_config.php');
-
-if (!isset($_SESSION['admin_id'])) {
-    header("Location: logout.php");
-    exit;
-}
-
-$school_id = $_SESSION['admin_id'];
-
-$sql = "SELECT exam_enabled FROM school_settings WHERE person='admin' AND person_id=? LIMIT 1";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $school_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$settings = $result->fetch_assoc();
-$stmt->close();
-
-if (!$settings || $settings['exam_enabled'] == 0) {
-    echo "<script>alert('Exam module is disabled by school admin.'); window.location.href='logout.php';</script>";
-    exit;
-}
-?>
-
-
+<?php require_once 'assets/php/header.php'; ?>
+<?php include_once('sass/db_config.php'); ?>
 <style>
 #timetable {
     padding-left: 20px;
@@ -34,7 +11,7 @@ if (!$settings || $settings['exam_enabled'] == 0) {
     display: block !important;
 }
 
-#createCE {
+#createAE {
     color: #000;
 }
 </style>
@@ -44,7 +21,7 @@ if (!$settings || $settings['exam_enabled'] == 0) {
             <h4>Manage Exams</h4>
         </div>
 
-        <!-- Form -->
+        <!-- Exam Form -->
         <form id="examForm">
             <input type="hidden" name="id" id="exam_id">
             <div class="form-group">
@@ -55,12 +32,12 @@ if (!$settings || $settings['exam_enabled'] == 0) {
                 <label>Total Marks</label>
                 <input type="number" name="total_marks" id="total_marks" class="form-control" required>
             </div>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary">Save It</button>
         </form>
 
         <hr>
 
-        <!-- Table -->
+        <!-- Exam List -->
         <h5>Exam List</h5>
         <table class="table table-bordered" id="examTable">
             <thead>
@@ -68,6 +45,7 @@ if (!$settings || $settings['exam_enabled'] == 0) {
                     <th>ID</th>
                     <th>Exam Name</th>
                     <th>Total Marks</th>
+                    <th>Created At</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -80,45 +58,52 @@ if (!$settings || $settings['exam_enabled'] == 0) {
 <script>
 $(document).ready(function() {
 
-    // Load exams
     function loadExams() {
-        $.get("ajax/exams_crud.php", {
-            action: "read"
-        }, function(data) {
+        $.get("ajax/exams_crud.php", function(data) {
             $("#examTable tbody").html(data);
         });
     }
     loadExams();
 
-    // Save exam (insert or update)
-    $("#examForm").submit(function(e) {
+
+    $("#examForm").on("submit", function(e) {
         e.preventDefault();
-        $.post("ajax/exams_crud.php", $(this).serialize() + "&action=save", function(res) {
-            alert(res.message);
-            if (res.status == "success") {
-                $("#examForm")[0].reset();
-                $("#exam_id").val("");
-                loadExams();
+        $.ajax({
+            url: "ajax/exams_crud.php",
+            type: "POST",
+            data: $(this).serialize() + "&action=save",
+            dataType: "json",
+            success: function(res) {
+                alert(res.message);
+                if (res.status === "success") {
+                    $("#examForm")[0].reset();
+                    $("#exam_id").val("");
+                    loadExams();
+                }
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                alert("An error occurred while saving exam.");
             }
-        }, "json");
+        });
     });
 
-    // Edit exam
     $(document).on("click", ".editBtn", function() {
         let id = $(this).data("id");
         $.get("ajax/exams_crud.php", {
             action: "get",
             id: id
         }, function(res) {
-            if (res.status == "success") {
+            if (res.status === "success") {
                 $("#exam_id").val(res.data.id);
                 $("#exam_name").val(res.data.exam_name);
                 $("#total_marks").val(res.data.total_marks);
+            } else {
+                alert(res.message);
             }
         }, "json");
     });
 
-    // Delete exam
     $(document).on("click", ".deleteBtn", function() {
         if (confirm("Delete this exam?")) {
             let id = $(this).data("id");
@@ -127,12 +112,11 @@ $(document).ready(function() {
                 id: id
             }, function(res) {
                 alert(res.message);
-                if (res.status == "success") loadExams();
+                if (res.status === "success") loadExams();
             }, "json");
         }
     });
 
 });
 </script>
-
 <?php require_once 'assets/php/footer.php'; ?>

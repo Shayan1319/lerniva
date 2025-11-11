@@ -1,29 +1,5 @@
 <?php require_once 'assets/php/header.php';?>
-<?php
 
-include_once('sass/db_config.php');
-
-if (!isset($_SESSION['admin_id'])) {
-    header("Location: logout.php");
-    exit;
-}
-
-$school_id = $_SESSION['admin_id']; // adjust if using campus_id/student_id
-
-$sql = "SELECT meeting_enabled FROM school_settings WHERE person='admin' AND person_id=? LIMIT 1";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $school_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$settings = $result->fetch_assoc();
-$stmt->close();
-
-// 🚨 If meeting module is disabled
-if (!$settings || $settings['meeting_enabled'] == 0) {
-    echo "<script>alert('Meeting module is disabled by school admin.'); window.location.href='logout.php';</script>";
-    exit;
-}
-?>
 <?php
 require_once 'sass/db_config.php';
 
@@ -100,7 +76,7 @@ $result = mysqli_query($conn, $sql);
                                                 data-agenda="<?= htmlspecialchars($row['agenda']); ?>"
                                                 data-requested="<?= $row['requester_id']; ?>"
                                                 data-with="<?= $row['id_meeter']; ?>">
-                                                Accept
+                                                Accept this
                                             </button>
                                             <button class="btn btn-danger btn-sm reject-btn"
                                                 data-id="<?= $row['id']; ?>">Reject</button>
@@ -134,6 +110,10 @@ $result = mysqli_query($conn, $sql);
                     <input type="hidden" name="person_one" id="personOne">
                     <input type="hidden" name="person_two" id="personTwo">
 
+                    <!-- Hidden preselected meeting roles -->
+                    <input type="hidden" name="meeting_person" id="meetingPerson">
+                    <input type="hidden" name="meeting_person2" id="meetingPerson2">
+
                     <div class="form-group">
                         <label>Meeting Title</label>
                         <input type="text" class="form-control" name="title" id="meetingTitle" readonly>
@@ -166,15 +146,31 @@ $result = mysqli_query($conn, $sql);
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Open Modal with Data
     $('.accept-btn').on('click', function() {
-        $('#requestId').val($(this).data('id'));
-        $('#meetingTitle').val($(this).data('title'));
-        $('#meetingAgenda').val($(this).data('agenda'));
-        $('#personOne').val($(this).data('requested'));
-        $('#personTwo').val($(this).data('with'));
+        const requestId = $(this).data('id');
+        const title = $(this).data('title');
+        const agenda = $(this).data('agenda');
+        const personOne = $(this).data('requested');
+        const personTwo = $(this).data('with');
+        const requestedBy = $(this).closest('tr').find('td:nth-child(3)').text().split(' ')[
+            0]; // extracts requested_by text
+        const withMeeting = $(this).closest('tr').find('td:nth-child(4)').text().split(' ')[
+            0]; // extracts with_meeting text
+
+        // Auto-assign roles
+        $('#meetingPerson').val(requestedBy.toLowerCase());
+        $('#meetingPerson2').val(withMeeting.toLowerCase());
+
+        // Fill form
+        $('#requestId').val(requestId);
+        $('#meetingTitle').val(title);
+        $('#meetingAgenda').val(agenda);
+        $('#personOne').val(personOne);
+        $('#personTwo').val(personTwo);
+
         $('#meetingModal').modal('show');
     });
+
 
     // Reject Meeting
     $('.reject-btn').on('click', function() {

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'admin/sass/db_config.php';
+require_once 'mail_library.php'; // ✅ use your new library
 
 // ✅ If session missing, redirect
 if (!isset($_SESSION['pending_email']) || !isset($_SESSION['user_type'])) {
@@ -85,23 +86,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update->bind_param("ss", $newCode, $email);
         $update->execute();
 
-        // ✅ Send email
-        $subject = "Your Verification Code";
-        $message = "Your new verification code is: $newCode\n\nThis code expires in 5 minutes.";
-        $headers = "From: noreply@yourdomain.com";
+        // // ✅ Send email
+        // $subject = "Your Verification Code";
+        // $message = "Your new verification code is: $newCode\n\nThis code expires in 5 minutes.";
+        // $headers = "From: noreply@yourdomain.com";
 
-        mail($email, $subject, $message, $headers);
+        // mail($email, $subject, $message, $headers);
 
-        $success = "✅ A new verification code has been sent to $email";
+        // $success = "✅ A new verification code has been sent to $email";
+        
+        // ✅ Send new code via PHPMailer
+        $subject = "Your Verification Code - Lurniva";
+        $body = "
+            <p>Hello,</p>
+            <p>Your new verification code is:</p>
+            <h2 style='color:#007bff;'>$newCode</h2>
+            <p>This code expires in <b>5 minutes</b>.</p>
+            <p>If you didn’t request this, please ignore this email.</p>
+            <br>
+            <p>Best regards,<br><b>Lurniva Support Team</b></p>
+        ";
+
+        if (sendMail($email, $subject, $body)) {
+            $success = "✅ A new verification code has been sent to <b>$email</b>.";
+        } else {
+            $error = "❌ Failed to send email. Please try again.";
+        }
     }
 }
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Email Verification</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
     <div class="container mt-5">
         <h2 class="mb-4">Verify Your Email</h2>
@@ -112,7 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST">
             <div class="mb-3">
                 <label>Enter 6-digit Code</label>
-                <input type="text" name="verification_code" class="form-control" pattern="[0-9]{6}" maxlength="6" required>
+                <input type="text" name="verification_code" class="form-control" pattern="[0-9]{6}" maxlength="6"
+                    required>
             </div>
             <button type="submit" class="btn btn-success">Verify</button>
         </form>
@@ -142,4 +164,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     updateTimer();
     </script>
 </body>
+
 </html>

@@ -1,0 +1,5 @@
+[19-Oct-2025 19:03:52 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'timing_table_id' in 'IN/ALL/ANY subquery' in D:\xampp\htdocs\Lurniva\lerniva\lerniva-lurniva_app\admin\ajax\delete_timetable.php:35
+Stack trace:
+#0 D:\xampp\htdocs\Lurniva\lerniva\lerniva-lurniva_app\admin\ajax\delete_timetable.php(35): mysqli->query('DELETE FROM cla...')
+#1 {main}
+  thrown in D:\xampp\htdocs\Lurniva\lerniva\lerniva-lurniva_app\admin\ajax\delete_timetable.php on line 35

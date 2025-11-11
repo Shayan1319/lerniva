@@ -1,4 +1,6 @@
-        <?php include_once "assets/php/header.php"?>
+        <?php include_once "assets/php/header.php";
+        include_once "assets/sass/db_config.php";
+        ?>
         <script>
 document.addEventListener("DOMContentLoaded", function() {
     let el = document.getElementById("dashboard");
